@@ -3,7 +3,8 @@
   "compilerOptions": {
     "moduleResolution": "bundler",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@tests/*": ["./tests/*"]
     },
     "plugins": [
       {
