@@ -21,8 +21,8 @@ import { BlockRow } from "../../components/blockchain/BlockRow";
 import { TransactionRow } from "../../components/blockchain/TransactionRow";
 import { StatsCard } from "./StatsCard";
 
-import { AKTAmount } from "@/components/AKTAmount";
 import { AKTLabel } from "@/components/AKTLabel";
+import { ChainStrip } from "@/components/charts/ChainStrip";
 import { DailySpendChartContainer } from "@/components/charts/DailySpendChart/DailySpendChartContainer";
 import { GlobalGridContainer } from "@/components/charts/GlobalGrid/GlobalGridContainer";
 import { LeasesGpuTrendsContainer } from "@/components/charts/LeasesGpuTrendsContainer";
@@ -171,10 +171,6 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
           </div>
 
           <div className="mt-6">
-            <NetworkCapacityCard networkCapacity={dashboardData.networkCapacity} />
-          </div>
-
-          <div className="mt-6">
             <GlobalGridContainer
               stats={{
                 activeProviderCount: dashboardData.networkCapacity.activeProviderCount,
@@ -184,6 +180,10 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
                 totalStorage: dashboardData.networkCapacity.totalStorage
               }}
             />
+          </div>
+
+          <div className="mt-6">
+            <NetworkCapacityCard networkCapacity={dashboardData.networkCapacity} />
           </div>
 
           <Separator className="mb-8 mt-8" />
@@ -448,57 +448,18 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
           </div>
         </>
       )}
-      {dashboardData.chainStats && (
+      {dashboardData.chainStats && dashboardData.now?.totalUUsdSpent !== undefined && dashboardData.now?.totalLeaseCount !== undefined && (
         <>
           <Separator className="mb-8 mt-8" />
           <Title subTitle className="mb-4">
             Blockchain
           </Title>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {dashboardData.chainStats.height > 0 && <StatsCard number={<FormattedNumber value={dashboardData.chainStats.height} />} text="Height" />}
-
-            {dashboardData.chainStats.transactionCount > 0 && (
-              <StatsCard number={<FormattedNumber value={dashboardData.chainStats.transactionCount} />} text="Transactions" />
-            )}
-
-            {dashboardData.chainStats.communityPool > 0 && (
-              <StatsCard number={<AKTAmount uakt={dashboardData.chainStats.communityPool} digits={0} showAKTLabel showUSD />} text="Community pool" />
-            )}
-
-            {dashboardData.chainStats.bondedTokens > 0 && dashboardData.chainStats.totalSupply > 0 && (
-              <StatsCard
-                number={
-                  <>
-                    <FormattedNumber value={udenomToDenom(dashboardData.chainStats.bondedTokens)} notation="compact" maximumFractionDigits={2} /> /{" "}
-                    <FormattedNumber value={udenomToDenom(dashboardData.chainStats.totalSupply)} notation="compact" maximumFractionDigits={2} />
-                    <span className="ml-4 text-sm text-muted-foreground">
-                      <FormattedNumber
-                        value={udenomToDenom(dashboardData.chainStats.bondedTokens) / udenomToDenom(dashboardData.chainStats.totalSupply)}
-                        style="percent"
-                        maximumFractionDigits={2}
-                      />
-                    </span>
-                  </>
-                }
-                text="Bonded tokens"
-              />
-            )}
-
-            {dashboardData.chainStats.inflation > 0 && (
-              <StatsCard
-                number={<FormattedNumber value={dashboardData.chainStats.inflation} style="percent" minimumFractionDigits={2} maximumFractionDigits={2} />}
-                text="Inflation"
-              />
-            )}
-
-            {dashboardData.chainStats.stakingAPR !== undefined && (
-              <StatsCard
-                number={<FormattedNumber value={dashboardData.chainStats.stakingAPR} style="percent" minimumFractionDigits={2} maximumFractionDigits={2} />}
-                text="Staking APR"
-              />
-            )}
-          </div>
+          <ChainStrip
+            chainStats={dashboardData.chainStats}
+            totalUUsdSpent={dashboardData.now.totalUUsdSpent}
+            totalLeaseCount={dashboardData.now.totalLeaseCount}
+          />
         </>
       )}
 
