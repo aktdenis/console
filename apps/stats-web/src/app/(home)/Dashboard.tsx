@@ -24,6 +24,7 @@ import { StatsCard } from "./StatsCard";
 import { AKTAmount } from "@/components/AKTAmount";
 import { AKTLabel } from "@/components/AKTLabel";
 import { DailySpendChartContainer } from "@/components/charts/DailySpendChart/DailySpendChartContainer";
+import { GlobalGridContainer } from "@/components/charts/GlobalGrid/GlobalGridContainer";
 import { LeasesGpuTrendsContainer } from "@/components/charts/LeasesGpuTrendsContainer";
 import { NetworkCapacityCard } from "@/components/charts/NetworkCapacityCard";
 import { HumanReadableBytes } from "@/components/HumanReadableBytes";
@@ -171,6 +172,18 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
 
           <div className="mt-6">
             <NetworkCapacityCard networkCapacity={dashboardData.networkCapacity} />
+          </div>
+
+          <div className="mt-6">
+            <GlobalGridContainer
+              stats={{
+                activeProviderCount: dashboardData.networkCapacity.activeProviderCount,
+                totalCPU: dashboardData.networkCapacity.totalCPU,
+                totalGPU: dashboardData.networkCapacity.totalGPU,
+                totalMemory: dashboardData.networkCapacity.totalMemory,
+                totalStorage: dashboardData.networkCapacity.totalStorage
+              }}
+            />
           </div>
 
           <Separator className="mb-8 mt-8" />
