@@ -23,6 +23,7 @@ import { StatsCard } from "./StatsCard";
 
 import { AKTAmount } from "@/components/AKTAmount";
 import { AKTLabel } from "@/components/AKTLabel";
+import { DailySpendChartContainer } from "@/components/charts/DailySpendChart/DailySpendChartContainer";
 import { HumanReadableBytes } from "@/components/HumanReadableBytes";
 import SearchBar from "@/components/SearchBar";
 import { Title } from "@/components/Title";
@@ -156,6 +157,10 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
                 diffPercent={percIncrease(dashboardData.compare.totalLeaseCount, dashboardData.now.totalLeaseCount)}
               />
             )}
+          </div>
+
+          <div className="mt-6">
+            <DailySpendChartContainer />
           </div>
 
           <Separator className="mb-8 mt-8" />
