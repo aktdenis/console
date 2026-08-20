@@ -171,10 +171,6 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
           </div>
 
           <div className="mt-6">
-            <NetworkCapacityCard networkCapacity={dashboardData.networkCapacity} />
-          </div>
-
-          <div className="mt-6">
             <GlobalGridContainer
               stats={{
                 activeProviderCount: dashboardData.networkCapacity.activeProviderCount,
@@ -184,6 +180,10 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
                 totalStorage: dashboardData.networkCapacity.totalStorage
               }}
             />
+          </div>
+
+          <div className="mt-6">
+            <NetworkCapacityCard networkCapacity={dashboardData.networkCapacity} />
           </div>
 
           <Separator className="mb-8 mt-8" />
