@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { FormattedNumber } from "react-intl";
-import { ArrowDown, ArrowUp } from "iconoir-react";
 
 import { cn } from "@/lib/utils";
 
@@ -14,21 +13,19 @@ export interface DiffPercentageChipProps {
 export const DiffPercentageChip: React.FunctionComponent<DiffPercentageChipProps> = ({ value, size = "small", className = "" }) => {
   if (typeof value !== "number") return null;
 
-  const isPositiveDiff = value >= 0;
+  const isNeutral = Math.abs(value) < 0.00005;
+  const isPositiveDiff = value > 0;
 
   return (
     <span
-      className={cn(className, "flex items-center font-bold", {
-        "text-red-400": !isPositiveDiff,
-        "text-green-600": isPositiveDiff,
-        "text-sm": size === "small",
-        "text-base": size === "medium"
-      })}
+      className={cn(
+        "inline-flex items-center whitespace-nowrap rounded-md font-medium",
+        isNeutral ? "bg-muted text-muted-foreground" : isPositiveDiff ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive",
+        size === "small" ? "px-1.5 py-0.5 text-xs" : "px-2 py-1 text-sm",
+        className
+      )}
     >
-      {isPositiveDiff ? <ArrowUp className="text-xs" /> : <ArrowDown className="text-xs" />}
-      <span className="ml-1">
-        <FormattedNumber style="percent" maximumFractionDigits={2} value={Math.abs(value)} />
-      </span>
+      <FormattedNumber style="percent" minimumFractionDigits={2} maximumFractionDigits={2} signDisplay="exceptZero" value={value} />
     </span>
   );
 };
