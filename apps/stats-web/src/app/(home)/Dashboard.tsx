@@ -25,6 +25,7 @@ import { AKTAmount } from "@/components/AKTAmount";
 import { AKTLabel } from "@/components/AKTLabel";
 import { DailySpendChartContainer } from "@/components/charts/DailySpendChart/DailySpendChartContainer";
 import { LeasesGpuTrendsContainer } from "@/components/charts/LeasesGpuTrendsContainer";
+import { NetworkCapacityCard } from "@/components/charts/NetworkCapacityCard";
 import { HumanReadableBytes } from "@/components/HumanReadableBytes";
 import SearchBar from "@/components/SearchBar";
 import { Title } from "@/components/Title";
@@ -166,6 +167,10 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
 
           <div className="mt-6">
             <LeasesGpuTrendsContainer totalGPU={dashboardData.networkCapacity.totalGPU} />
+          </div>
+
+          <div className="mt-6">
+            <NetworkCapacityCard networkCapacity={dashboardData.networkCapacity} />
           </div>
 
           <Separator className="mb-8 mt-8" />
