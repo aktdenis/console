@@ -12,7 +12,7 @@ describe(DashboardTabs.name, () => {
     setup();
 
     expect(screen.getByRole("tab", { name: "Overview" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Asset Spent" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Assets Spent" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Network Resources" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Resources Leased" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Assets Spent (AKT)" })).toBeInTheDocument();

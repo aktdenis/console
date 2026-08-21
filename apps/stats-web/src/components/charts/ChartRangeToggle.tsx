@@ -17,14 +17,20 @@ export const ChartRangeToggle: FC<ChartRangeToggleProps> = ({ options, value, on
   <ToggleGroup
     type="single"
     variant="outline"
+    size="sm"
     value={value}
     onValueChange={next => {
       if (next) onValueChange(next);
     }}
-    className="flex-wrap justify-start"
+    className="flex-wrap justify-start gap-0"
   >
     {options.map(option => (
-      <ToggleGroupItem key={option.key} value={option.key} aria-label={option.label}>
+      <ToggleGroupItem
+        key={option.key}
+        value={option.key}
+        aria-label={option.label}
+        className="rounded-none first:rounded-l-md last:rounded-r-md [&:not(:first-child)]:-ml-px"
+      >
         {option.label}
       </ToggleGroupItem>
     ))}

@@ -1,15 +1,13 @@
 import type { FC } from "react";
-import { FormattedNumber } from "react-intl";
 
-import { AKTLabel } from "@/components/AKTLabel";
-import { AktSpendChartContainer } from "@/components/charts/AktSpendChart/AktSpendChartContainer";
+import { SpendChartContainer } from "@/components/charts/SpendChart/SpendChartContainer";
+import { ACT_DENOM, AKT_DENOM } from "@/components/charts/SpendChart/spendDenoms";
 import { DiffPercentageChip } from "@/components/DiffPercentageChip";
-import { StatCardRow } from "@/components/StatCardRow";
-import { ACTLabel } from "@/components/UsdLabel";
+import { StatCardTabs } from "@/components/StatCardTabs";
 import { percIncrease, udenomToDenom } from "@/lib/mathHelpers";
 import type { DashboardBlockStats } from "@/types";
 
-export const DEPENDENCIES = { AktSpendChartContainer };
+export const DEPENDENCIES = { SpendChartContainer };
 
 export type AssetsSpentAktSectionProps = {
   now: DashboardBlockStats;
@@ -18,38 +16,33 @@ export type AssetsSpentAktSectionProps = {
 };
 
 export const AssetsSpentAktSection: FC<AssetsSpentAktSectionProps> = ({ now, compare, dependencies: d = DEPENDENCIES }) => (
-  <>
-    <StatCardRow
-      items={[
-        {
-          key: "akt-spent",
-          label: "AKT Spent",
-          tooltip: "Total AKT spent to rent computing power on the Akash network since the beginning of the network (March 2021).",
-          value: (
-            <>
-              <FormattedNumber value={udenomToDenom(now.totalUAktSpent)} notation="compact" maximumFractionDigits={2} />
-              <AKTLabel />
-              <DiffPercentageChip value={percIncrease(compare.totalUAktSpent, now.totalUAktSpent)} />
-            </>
-          )
-        },
-        {
-          key: "act-spent",
-          label: "ACT Spent",
-          tooltip: "Total ACT spent to rent computing power on the Akash network (includes historical USDC at 1:1).",
-          value: (
-            <>
-              <FormattedNumber value={udenomToDenom(now.totalUActSpent)} style="currency" currency="USD" notation="compact" maximumFractionDigits={2} />
-              <ACTLabel />
-              <DiffPercentageChip value={percIncrease(compare.totalUActSpent, now.totalUActSpent)} />
-            </>
-          )
-        }
-      ]}
-    />
-
-    <div className="mt-6">
-      <d.AktSpendChartContainer />
-    </div>
-  </>
+  <StatCardTabs
+    defaultValue={AKT_DENOM.key}
+    items={[
+      {
+        value: ACT_DENOM.key,
+        label: ACT_DENOM.tabLabel,
+        tooltip: ACT_DENOM.totalTooltip,
+        content: (
+          <>
+            {ACT_DENOM.formatTotal(udenomToDenom(now.totalUActSpent))}
+            <DiffPercentageChip value={percIncrease(compare.totalUActSpent, now.totalUActSpent)} />
+          </>
+        ),
+        panel: <d.SpendChartContainer denom={ACT_DENOM} className="rounded-t-none border-t-0" />
+      },
+      {
+        value: AKT_DENOM.key,
+        label: AKT_DENOM.tabLabel,
+        tooltip: AKT_DENOM.totalTooltip,
+        content: (
+          <>
+            {AKT_DENOM.formatTotal(udenomToDenom(now.totalUAktSpent))}
+            <DiffPercentageChip value={percIncrease(compare.totalUAktSpent, now.totalUAktSpent)} />
+          </>
+        ),
+        panel: <d.SpendChartContainer denom={AKT_DENOM} className="rounded-t-none border-t-0" />
+      }
+    ]}
+  />
 );

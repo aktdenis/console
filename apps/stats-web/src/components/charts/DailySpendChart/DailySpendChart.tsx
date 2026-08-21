@@ -1,4 +1,4 @@
-import { type FC, useMemo, useState } from "react";
+import { type FC, useMemo, useRef, useState } from "react";
 import { FormattedNumber } from "react-intl";
 import type { ChartConfig } from "@akashnetwork/ui/components";
 import {
@@ -17,16 +17,17 @@ import { format, parseISO } from "date-fns";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import { ChartRangeToggle } from "@/components/charts/ChartRangeToggle";
+import { ChartDownloadButton } from "@/components/charts/chartSnapshot/ChartDownloadButton";
 import { DiffPercentageChip } from "@/components/DiffPercentageChip";
 import { percIncrease, udenomToDenom } from "@/lib/mathHelpers";
 import type { SnapshotValue } from "@/types";
 
 const RANGE_OPTIONS = [
-  { key: "7D", days: 7, label: "Last 7 Days", footerPhrase: "the last 7 days" },
-  { key: "30D", days: 30, label: "Last 30 Days", footerPhrase: "the last 30 days" },
-  { key: "3M", days: 90, label: "Last 3 Months", footerPhrase: "the last 3 months" },
+  { key: "All", days: Number.MAX_SAFE_INTEGER, label: "All", footerPhrase: "the full history" },
   { key: "1Y", days: 365, label: "Last Year", footerPhrase: "the last year" },
-  { key: "All", days: Number.MAX_SAFE_INTEGER, label: "All Time", footerPhrase: "the full history" }
+  { key: "3M", days: 90, label: "Last 3 months", footerPhrase: "the last 3 months" },
+  { key: "30D", days: 30, label: "Last 30 days", footerPhrase: "the last 30 days" },
+  { key: "7D", days: 7, label: "Last 7 days", footerPhrase: "the last 7 days" }
 ] as const;
 
 const DEFAULT_RANGE_KEY: (typeof RANGE_OPTIONS)[number]["key"] = "30D";
@@ -48,6 +49,7 @@ export const DEPENDENCIES = {
   ChartTooltip,
   ChartTooltipContent,
   ChartRangeToggle,
+  ChartDownloadButton,
   AreaChart,
   CartesianGrid,
   XAxis,
@@ -67,6 +69,7 @@ export type DailySpendChartProps = {
 export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, currentValue, compareValue, isFetching, dependencies: d = DEPENDENCIES }) => {
   const [rangeKey, setRangeKey] = useState<string>(DEFAULT_RANGE_KEY);
   const activeRange = RANGE_OPTIONS.find(option => option.key === rangeKey) ?? RANGE_OPTIONS[1];
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const rangedData: ChartPoint[] = useMemo(() => {
     const sliceStart = Math.max(completedSnapshots.length - activeRange.days, 0);
@@ -85,7 +88,7 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
   }, [rangedData]);
 
   return (
-    <d.Card>
+    <d.Card ref={cardRef}>
       <d.CardHeader className="flex flex-col items-start gap-4 space-y-0 sm:flex-row sm:justify-between">
         <div className="flex flex-col gap-1.5">
           <d.CardTitle className="text-base">USD Spent · {activeRange.label}</d.CardTitle>
@@ -100,7 +103,15 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
           <d.CardDescription>Lease settlement per day, USD equivalent</d.CardDescription>
         </div>
 
-        <d.ChartRangeToggle options={RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
+        <div className="flex items-center gap-2">
+          <d.ChartRangeToggle options={RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
+          <d.ChartDownloadButton
+            targetRef={cardRef}
+            fileName="usd-spend-chart.png"
+            title={`USD Spent · ${activeRange.label}`}
+            subtitle="Lease settlement per day, USD equivalent"
+          />
+        </div>
       </d.CardHeader>
 
       <d.CardContent>

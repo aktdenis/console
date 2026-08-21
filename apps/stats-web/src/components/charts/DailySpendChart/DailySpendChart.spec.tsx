@@ -49,7 +49,7 @@ describe(DailySpendChart.name, () => {
   it("titles the card with the default range, not a fixed cadence unrelated to the selected range", () => {
     const { container } = setup({ completedSnapshots: daysOfSnapshots(5), currentValue: 0, compareValue: 0, isFetching: false });
 
-    expect(container.textContent).toContain("USD Spent · Last 30 Days");
+    expect(container.textContent).toContain("USD Spent · Last 30 days");
   });
 
   it("dims the chart while fetching", () => {
