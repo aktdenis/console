@@ -10,25 +10,23 @@ import {
   CardTitle,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
-  Tabs,
-  TabsList,
-  TabsTrigger
+  ChartTooltipContent
 } from "@akashnetwork/ui/components";
 import { cn } from "@akashnetwork/ui/utils";
 import { format, parseISO } from "date-fns";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
+import { ChartRangeToggle } from "@/components/charts/ChartRangeToggle";
 import { DiffPercentageChip } from "@/components/DiffPercentageChip";
 import { percIncrease, udenomToDenom } from "@/lib/mathHelpers";
 import type { SnapshotValue } from "@/types";
 
 const RANGE_OPTIONS = [
-  { key: "7D", days: 7 },
-  { key: "30D", days: 30 },
-  { key: "3M", days: 90 },
-  { key: "1Y", days: 365 },
-  { key: "All", days: Number.MAX_SAFE_INTEGER }
+  { key: "7D", days: 7, label: "Last 7 Days", footerPhrase: "the last 7 days" },
+  { key: "30D", days: 30, label: "Last 30 Days", footerPhrase: "the last 30 days" },
+  { key: "3M", days: 90, label: "Last 3 Months", footerPhrase: "the last 3 months" },
+  { key: "1Y", days: 365, label: "Last Year", footerPhrase: "the last year" },
+  { key: "All", days: Number.MAX_SAFE_INTEGER, label: "All Time", footerPhrase: "the full history" }
 ] as const;
 
 const DEFAULT_RANGE_KEY: (typeof RANGE_OPTIONS)[number]["key"] = "30D";
@@ -49,9 +47,7 @@ export const DEPENDENCIES = {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  Tabs,
-  TabsList,
-  TabsTrigger,
+  ChartRangeToggle,
   AreaChart,
   CartesianGrid,
   XAxis,
@@ -70,12 +66,12 @@ export type DailySpendChartProps = {
 
 export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, currentValue, compareValue, isFetching, dependencies: d = DEPENDENCIES }) => {
   const [rangeKey, setRangeKey] = useState<string>(DEFAULT_RANGE_KEY);
-  const selectedDays = RANGE_OPTIONS.find(option => option.key === rangeKey)?.days ?? RANGE_OPTIONS[1].days;
+  const activeRange = RANGE_OPTIONS.find(option => option.key === rangeKey) ?? RANGE_OPTIONS[1];
 
   const rangedData: ChartPoint[] = useMemo(() => {
-    const sliceStart = Math.max(completedSnapshots.length - selectedDays, 0);
+    const sliceStart = Math.max(completedSnapshots.length - activeRange.days, 0);
     return completedSnapshots.slice(sliceStart).map(snapshot => ({ date: snapshot.date, dailyUsdSpent: udenomToDenom(snapshot.value) }));
-  }, [completedSnapshots, selectedDays]);
+  }, [completedSnapshots, activeRange.days]);
 
   const latestCompleteDay = completedSnapshots.at(-1);
   const latestValue = latestCompleteDay ? udenomToDenom(latestCompleteDay.value) : undefined;
@@ -88,13 +84,11 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
     return { percent: percIncrease(first.dailyUsdSpent, last.dailyUsdSpent), from: first.date, to: last.date };
   }, [rangedData]);
 
-  const rangeLabel = RANGE_OPTIONS.find(option => option.key === rangeKey)?.key ?? DEFAULT_RANGE_KEY;
-
   return (
     <d.Card>
       <d.CardHeader className="flex flex-col items-start gap-4 space-y-0 sm:flex-row sm:justify-between">
         <div className="flex flex-col gap-1.5">
-          <d.CardTitle className="text-base">Daily Spend</d.CardTitle>
+          <d.CardTitle className="text-base">USD Spent · {activeRange.label}</d.CardTitle>
           {latestValue !== undefined && (
             <div className="flex items-center gap-2">
               <span className="text-lg font-semibold leading-none text-foreground">
@@ -106,15 +100,7 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
           <d.CardDescription>Lease settlement per day, USD equivalent</d.CardDescription>
         </div>
 
-        <d.Tabs value={rangeKey} onValueChange={setRangeKey} className="w-full sm:w-auto">
-          <d.TabsList className="h-auto w-full justify-between p-0.5 sm:w-auto sm:justify-start">
-            {RANGE_OPTIONS.map(option => (
-              <d.TabsTrigger key={option.key} value={option.key} className="px-2 py-1 text-xs sm:px-2.5">
-                {option.key}
-              </d.TabsTrigger>
-            ))}
-          </d.TabsList>
-        </d.Tabs>
+        <d.ChartRangeToggle options={RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
       </d.CardHeader>
 
       <d.CardContent>
@@ -160,8 +146,7 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
         {trend && (
           <p className="font-medium text-foreground">
             Trending {trend.percent === 0 ? "flat" : trend.percent > 0 ? "up" : "down"}{" "}
-            <FormattedNumber value={Math.abs(trend.percent)} style="percent" maximumFractionDigits={1} /> over{" "}
-            {rangeLabel === "All" ? "the full history" : `the last ${rangeLabel}`}
+            <FormattedNumber value={Math.abs(trend.percent)} style="percent" maximumFractionDigits={1} /> over {activeRange.footerPhrase}
           </p>
         )}
         <p className="text-xs text-muted-foreground">

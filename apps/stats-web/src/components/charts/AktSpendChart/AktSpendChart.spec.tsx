@@ -57,6 +57,12 @@ describe(AktSpendChart.name, () => {
     expect(container.textContent).toContain("AKT");
   });
 
+  it("titles the card with the default range, not a fixed cadence unrelated to the selected range", () => {
+    const { container } = setup({ completedSnapshots: daysOfSnapshots(5), currentValue: 0, compareValue: 0, isFetching: false });
+
+    expect(container.textContent).toContain("AKT Spent · Last 30 Days");
+  });
+
   it("dims the chart while fetching", () => {
     const { deps } = setup({ completedSnapshots: daysOfSnapshots(5), currentValue: 0, compareValue: 0, isFetching: true });
 

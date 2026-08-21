@@ -8,10 +8,12 @@ import { render } from "@testing-library/react";
 import { MockComponents } from "@tests/unit/mocks";
 
 function daysOfSnapshots(count: number): SnapshotValue[] {
-  return Array.from({ length: count }, (_, i) => ({
-    date: `2026-07-${String((i % 28) + 1).padStart(2, "0")}`,
-    value: (i + 1) * 1_000_000
-  }));
+  const start = new Date("2026-07-01T00:00:00Z");
+  return Array.from({ length: count }, (_, i) => {
+    const date = new Date(start);
+    date.setUTCDate(date.getUTCDate() + i);
+    return { date: date.toISOString().slice(0, 10), value: (i + 1) * 1_000_000 };
+  });
 }
 
 describe(DailySpendChart.name, () => {
@@ -42,6 +44,12 @@ describe(DailySpendChart.name, () => {
     });
 
     expect(deps.DiffPercentageChip.mock.calls.at(-1)?.at(0)).toEqual(expect.objectContaining({ value: 0.2 }));
+  });
+
+  it("titles the card with the default range, not a fixed cadence unrelated to the selected range", () => {
+    const { container } = setup({ completedSnapshots: daysOfSnapshots(5), currentValue: 0, compareValue: 0, isFetching: false });
+
+    expect(container.textContent).toContain("USD Spent · Last 30 Days");
   });
 
   it("dims the chart while fetching", () => {
