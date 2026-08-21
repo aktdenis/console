@@ -18,6 +18,7 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import { ChartRangeToggle } from "@/components/charts/ChartRangeToggle";
 import { ChartDownloadButton } from "@/components/charts/chartSnapshot/ChartDownloadButton";
+import type { SpendDenom } from "@/components/charts/SpendChart/spendDenoms";
 import { DiffPercentageChip } from "@/components/DiffPercentageChip";
 import { percIncrease, udenomToDenom } from "@/lib/mathHelpers";
 import type { SnapshotValue } from "@/types";
@@ -27,16 +28,13 @@ const RANGE_OPTIONS = [
   { key: "1Y", days: 365, label: "Last Year", footerPhrase: "the last year" },
   { key: "3M", days: 90, label: "Last 3 months", footerPhrase: "the last 3 months" },
   { key: "30D", days: 30, label: "Last 30 days", footerPhrase: "the last 30 days" },
-  { key: "7D", days: 7, label: "Last 7 days", footerPhrase: "the last 7 days" }
+  { key: "7D", days: 7, label: "Last 7 days", footerPhrase: "the last 7 days" },
+  { key: "24H", days: 1, label: "Last 24hr", footerPhrase: "the last 24 hours" }
 ] as const;
 
 const DEFAULT_RANGE_KEY: (typeof RANGE_OPTIONS)[number]["key"] = "30D";
 
-const chartConfig = {
-  dailyUsdSpent: { label: "Daily USD Spent", color: "hsl(var(--foreground))" }
-} satisfies ChartConfig;
-
-type ChartPoint = { date: string; dailyUsdSpent: number };
+type ChartPoint = { date: string; value: number };
 
 export const DEPENDENCIES = {
   Card,
@@ -57,23 +55,41 @@ export const DEPENDENCIES = {
   DiffPercentageChip
 };
 
-export type DailySpendChartProps = {
+export type SpendChartProps = {
+  denom: SpendDenom;
   /** Fully-settled days only - the in-progress "today" point is dropped by the caller. */
   completedSnapshots: SnapshotValue[];
   currentValue: number;
   compareValue: number;
   isFetching: boolean;
+  className?: string;
   dependencies?: typeof DEPENDENCIES;
 };
 
-export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, currentValue, compareValue, isFetching, dependencies: d = DEPENDENCIES }) => {
+export const SpendChart: FC<SpendChartProps> = ({
+  denom,
+  completedSnapshots,
+  currentValue,
+  compareValue,
+  isFetching,
+  className,
+  dependencies: d = DEPENDENCIES
+}) => {
   const [rangeKey, setRangeKey] = useState<string>(DEFAULT_RANGE_KEY);
   const activeRange = RANGE_OPTIONS.find(option => option.key === rangeKey) ?? RANGE_OPTIONS[1];
   const cardRef = useRef<HTMLDivElement>(null);
 
+  const chartConfig = useMemo(
+    () =>
+      ({
+        value: { label: denom.chartLabel, color: "hsl(var(--foreground))" }
+      }) satisfies ChartConfig,
+    [denom.chartLabel]
+  );
+
   const rangedData: ChartPoint[] = useMemo(() => {
     const sliceStart = Math.max(completedSnapshots.length - activeRange.days, 0);
-    return completedSnapshots.slice(sliceStart).map(snapshot => ({ date: snapshot.date, dailyUsdSpent: udenomToDenom(snapshot.value) }));
+    return completedSnapshots.slice(sliceStart).map(snapshot => ({ date: snapshot.date, value: udenomToDenom(snapshot.value) }));
   }, [completedSnapshots, activeRange.days]);
 
   const latestCompleteDay = completedSnapshots.at(-1);
@@ -84,32 +100,32 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
     if (rangedData.length < 2) return null;
     const first = rangedData[0];
     const last = rangedData[rangedData.length - 1];
-    return { percent: percIncrease(first.dailyUsdSpent, last.dailyUsdSpent), from: first.date, to: last.date };
+    return { percent: percIncrease(first.value, last.value), from: first.date, to: last.date };
   }, [rangedData]);
 
   return (
-    <d.Card ref={cardRef}>
+    <d.Card ref={cardRef} className={className}>
       <d.CardHeader className="flex flex-col items-start gap-4 space-y-0 sm:flex-row sm:justify-between">
         <div className="flex flex-col gap-1.5">
-          <d.CardTitle className="text-base">USD Spent · {activeRange.label}</d.CardTitle>
+          <d.CardTitle className="text-base">
+            {denom.titlePrefix} · {activeRange.label}
+          </d.CardTitle>
           {latestValue !== undefined && (
             <div className="flex items-center gap-2">
-              <span className="text-lg font-semibold leading-none text-foreground">
-                <FormattedNumber value={latestValue} style="currency" currency="USD" maximumFractionDigits={0} notation="compact" compactDisplay="short" />
-              </span>
+              <span className="text-lg font-semibold leading-none text-foreground">{denom.formatAmount(latestValue)}</span>
               <d.DiffPercentageChip value={latestDayDelta} />
             </div>
           )}
-          <d.CardDescription>Lease settlement per day, USD equivalent</d.CardDescription>
+          <d.CardDescription>{denom.description}</d.CardDescription>
         </div>
 
         <div className="flex items-center gap-2">
           <d.ChartRangeToggle options={RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
           <d.ChartDownloadButton
             targetRef={cardRef}
-            fileName="usd-spend-chart.png"
-            title={`USD Spent · ${activeRange.label}`}
-            subtitle="Lease settlement per day, USD equivalent"
+            fileName={`${denom.key}-spend-chart.png`}
+            title={`${denom.titlePrefix} · ${activeRange.label}`}
+            subtitle={denom.description}
           />
         </div>
       </d.CardHeader>
@@ -132,23 +148,16 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
             <d.ChartTooltip
               content={
                 <d.ChartTooltipContent
-                  nameKey="dailyUsdSpent"
+                  nameKey="value"
                   labelFormatter={value => {
                     const date = parseISO(value);
                     return isNaN(date.getTime()) ? value : format(date, "MMM d, yyyy");
                   }}
-                  formatter={value => <FormattedNumber value={Number(value)} style="currency" currency="USD" maximumFractionDigits={2} />}
+                  formatter={value => denom.formatTooltipAmount(Number(value))}
                 />
               }
             />
-            <d.Area
-              dataKey="dailyUsdSpent"
-              type="monotone"
-              stroke="var(--color-dailyUsdSpent)"
-              fill="var(--color-dailyUsdSpent)"
-              fillOpacity={0.15}
-              strokeWidth={2}
-            />
+            <d.Area dataKey="value" type="monotone" stroke="var(--color-value)" fill="var(--color-value)" fillOpacity={0.15} strokeWidth={2} />
           </d.AreaChart>
         </d.ChartContainer>
       </d.CardContent>
