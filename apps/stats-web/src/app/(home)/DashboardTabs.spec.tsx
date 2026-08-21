@@ -26,6 +26,16 @@ describe(DashboardTabs.name, () => {
     expect(deps.Dashboard.mock.calls.at(0)?.at(0)).toMatchObject({ dashboardData, marketData });
   });
 
+  it("shows the Network Capacity title and section when the Network Resources tab is selected", () => {
+    const { deps, dashboardData } = setup();
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Network Resources" }));
+
+    expect(screen.getByText("Network Capacity")).toBeInTheDocument();
+    expect(deps.NetworkCapacitySection.mock.calls.at(0)?.at(0)).toEqual({ networkCapacity: dashboardData.networkCapacity });
+    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
+  });
+
   it("switches to a placeholder when a not-yet-built tab is selected, replacing the Overview panel", () => {
     setup();
 
