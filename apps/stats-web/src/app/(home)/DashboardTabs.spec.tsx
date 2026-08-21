@@ -8,14 +8,13 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MockComponents } from "@tests/unit/mocks";
 
 describe(DashboardTabs.name, () => {
-  it("renders a trigger for all seven tabs", () => {
+  it("renders a trigger for all six tabs", () => {
     setup();
 
     expect(screen.getByRole("tab", { name: "Overview" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Assets Spent" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Network Resources" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Resources Leased" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Assets Spent (AKT)" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "BME" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Blockchain" })).toBeInTheDocument();
   });
@@ -26,13 +25,15 @@ describe(DashboardTabs.name, () => {
     expect(deps.Dashboard.mock.calls.at(0)?.at(0)).toMatchObject({ dashboardData, marketData });
   });
 
-  it("shows the Assets Spent title and section when that tab is selected", () => {
+  it("shows both the USD and AKT&ACT Assets Spent titles and sections when that tab is selected", () => {
     const { deps, dashboardData } = setup();
 
     fireEvent.mouseDown(screen.getByRole("tab", { name: "Assets Spent" }));
 
-    expect(screen.getByRole("heading", { name: "Assets Spent" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Assets Spent (USD)" })).toBeInTheDocument();
     expect(deps.AssetsSpentSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
+    expect(screen.getByRole("heading", { name: "Assets Spent (AKT&ACT)" })).toBeInTheDocument();
+    expect(deps.AssetsSpentAktSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
     expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
   });
 
@@ -43,16 +44,6 @@ describe(DashboardTabs.name, () => {
 
     expect(screen.getByText("Network Capacity")).toBeInTheDocument();
     expect(deps.NetworkCapacitySection.mock.calls.at(0)?.at(0)).toEqual({ networkCapacity: dashboardData.networkCapacity });
-    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
-  });
-
-  it("shows the Assets Spent (AKT) title and section when that tab is selected", () => {
-    const { deps, dashboardData } = setup();
-
-    fireEvent.mouseDown(screen.getByRole("tab", { name: "Assets Spent (AKT)" }));
-
-    expect(screen.getByRole("heading", { name: "Assets Spent (AKT)" })).toBeInTheDocument();
-    expect(deps.AssetsSpentAktSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
     expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
   });
 

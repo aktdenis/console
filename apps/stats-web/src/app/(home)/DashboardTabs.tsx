@@ -15,12 +15,11 @@ const TABS = [
   { value: "assets-spent", label: "Assets Spent" },
   { value: "network-resources", label: "Network Resources" },
   { value: "resources-leased", label: "Resources Leased" },
-  { value: "assets-spent-akt", label: "Assets Spent (AKT)" },
   { value: "bme", label: "BME" },
   { value: "blockchain", label: "Blockchain" }
 ] as const;
 
-const BUILT_TAB_VALUES = ["overview", "assets-spent", "network-resources", "assets-spent-akt"] as const;
+const BUILT_TAB_VALUES = ["overview", "assets-spent", "network-resources"] as const;
 
 const UPCOMING_TABS = TABS.filter(tab => !BUILT_TAB_VALUES.includes(tab.value as (typeof BUILT_TAB_VALUES)[number]));
 
@@ -57,9 +56,14 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
 
     <TabsContent value="assets-spent" className="mt-5">
       <Title subTitle className="mb-5 text-3xl font-bold tracking-tight sm:text-3xl">
-        Assets Spent
+        Assets Spent (USD)
       </Title>
       <d.AssetsSpentSection now={dashboardData.now} compare={dashboardData.compare} />
+
+      <Title subTitle className="mb-5 mt-8 text-3xl font-bold tracking-tight sm:text-3xl">
+        Assets Spent (AKT&ACT)
+      </Title>
+      <d.AssetsSpentAktSection now={dashboardData.now} compare={dashboardData.compare} />
     </TabsContent>
 
     <TabsContent value="network-resources" className="mt-5">
@@ -67,13 +71,6 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
         Network Capacity
       </Title>
       <d.NetworkCapacitySection networkCapacity={dashboardData.networkCapacity} />
-    </TabsContent>
-
-    <TabsContent value="assets-spent-akt" className="mt-5">
-      <Title subTitle className="mb-5 text-3xl font-bold tracking-tight sm:text-3xl">
-        Assets Spent (AKT)
-      </Title>
-      <d.AssetsSpentAktSection now={dashboardData.now} compare={dashboardData.compare} />
     </TabsContent>
 
     {UPCOMING_TABS.map(tab => (
