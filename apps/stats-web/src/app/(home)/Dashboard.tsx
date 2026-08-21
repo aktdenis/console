@@ -24,9 +24,8 @@ import { StatsCard } from "./StatsCard";
 import { AKTLabel } from "@/components/AKTLabel";
 import { ChainStrip } from "@/components/charts/ChainStrip";
 import { DailySpendChartContainer } from "@/components/charts/DailySpendChart/DailySpendChartContainer";
-import { GlobalGridContainer } from "@/components/charts/GlobalGrid/GlobalGridContainer";
 import { LeasesGpuTrendsContainer } from "@/components/charts/LeasesGpuTrendsContainer";
-import { NetworkCapacityCard } from "@/components/charts/NetworkCapacityCard";
+import { NetworkCapacitySection } from "@/components/charts/NetworkCapacitySection";
 import { HumanReadableBytes } from "@/components/HumanReadableBytes";
 import SearchBar from "@/components/SearchBar";
 import { Title } from "@/components/Title";
@@ -35,7 +34,7 @@ import { percIncrease, udenomToDenom } from "@/lib/mathHelpers";
 import { bytesToShrink } from "@/lib/unitUtils";
 import { UrlService } from "@/lib/urlUtils";
 import type { DashboardData, MarketData } from "@/types";
-import { ProviderSnapshotsUrlParam, SnapshotsUrlParam } from "@/types";
+import { SnapshotsUrlParam } from "@/types";
 
 interface IDashboardProps {
   dashboardData: DashboardData;
@@ -51,14 +50,6 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
   const storageDiff =
     dashboardData?.compare?.activeStorage !== undefined && dashboardData?.now?.activeStorage !== undefined
       ? bytesToShrink(dashboardData.now.activeStorage - dashboardData.compare.activeStorage)
-      : bytesToShrink(0);
-  const capacityMemoryDiff =
-    dashboardData?.networkCapacityStats?.now?.memory !== undefined && dashboardData?.networkCapacityStats?.compare?.memory !== undefined
-      ? bytesToShrink(dashboardData.networkCapacityStats.now.memory - dashboardData.networkCapacityStats.compare.memory)
-      : bytesToShrink(0);
-  const capacityStorageDiff =
-    dashboardData?.networkCapacityStats?.now?.storage !== undefined && dashboardData?.networkCapacityStats?.compare?.storage !== undefined
-      ? bytesToShrink(dashboardData.networkCapacityStats.now.storage - dashboardData.networkCapacityStats.compare.storage)
       : bytesToShrink(0);
 
   return (
@@ -171,19 +162,7 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
           </div>
 
           <div className="mt-6">
-            <GlobalGridContainer
-              stats={{
-                activeProviderCount: dashboardData.networkCapacity.activeProviderCount,
-                totalCPU: dashboardData.networkCapacity.totalCPU,
-                totalGPU: dashboardData.networkCapacity.totalGPU,
-                totalMemory: dashboardData.networkCapacity.totalMemory,
-                totalStorage: dashboardData.networkCapacity.totalStorage
-              }}
-            />
-          </div>
-
-          <div className="mt-6">
-            <NetworkCapacityCard networkCapacity={dashboardData.networkCapacity} />
+            <NetworkCapacitySection networkCapacity={dashboardData.networkCapacity} />
           </div>
 
           <Separator className="mb-8 mt-8" />
@@ -263,97 +242,6 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
         </>
       )}
 
-      {dashboardData.networkCapacity && dashboardData.networkCapacity && (
-        <>
-          <Separator className="mb-8 mt-8" />
-          <Title subTitle className="mb-4">
-            Network Capacity
-          </Title>
-
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
-            {dashboardData.networkCapacity.activeProviderCount !== undefined &&
-              dashboardData.networkCapacityStats.now.count !== undefined &&
-              dashboardData.networkCapacityStats.compare.count !== undefined && (
-                <StatsCard
-                  number={<FormattedNumber value={dashboardData.networkCapacity.activeProviderCount} notation="compact" compactDisplay="short" />}
-                  text="Active providers"
-                  graphPath={UrlService.providerGraph(ProviderSnapshotsUrlParam.count)}
-                  diffNumber={dashboardData.networkCapacityStats.now.count - dashboardData.networkCapacityStats.compare.count}
-                  diffPercent={percIncrease(dashboardData.networkCapacityStats.compare.count, dashboardData.networkCapacityStats.now.count)}
-                  tooltip={
-                    <>
-                      <div>This is the number of providers currently active on the network.</div>
-                    </>
-                  }
-                />
-              )}
-
-            {dashboardData.networkCapacity.totalCPU !== undefined &&
-              dashboardData.networkCapacityStats.now.cpu !== undefined &&
-              dashboardData.networkCapacityStats.compare.cpu !== undefined && (
-                <StatsCard
-                  number={
-                    <>
-                      <FormattedNumber
-                        value={dashboardData.networkCapacity.totalCPU / 1000}
-                        maximumFractionDigits={2}
-                        notation="compact"
-                        compactDisplay="short"
-                      />{" "}
-                      <span className="text-sm">CPU</span>
-                    </>
-                  }
-                  text="Compute"
-                  graphPath={UrlService.providerGraph(ProviderSnapshotsUrlParam.cpu)}
-                  diffNumber={(dashboardData.networkCapacityStats.now.cpu - dashboardData.networkCapacityStats.compare.cpu) / 1000}
-                  diffPercent={percIncrease(dashboardData.networkCapacityStats.compare.cpu, dashboardData.networkCapacityStats.now.cpu)}
-                />
-              )}
-            {dashboardData.networkCapacity.totalGPU !== undefined &&
-              dashboardData.networkCapacityStats.now.gpu !== undefined &&
-              dashboardData.networkCapacityStats.compare.gpu !== undefined && (
-                <StatsCard
-                  number={
-                    <>
-                      <FormattedNumber value={dashboardData.networkCapacity.totalGPU} maximumFractionDigits={2} notation="compact" compactDisplay="short" />{" "}
-                      <span className="text-sm">GPU</span>
-                    </>
-                  }
-                  text="Graphics"
-                  graphPath={UrlService.providerGraph(ProviderSnapshotsUrlParam.gpu)}
-                  diffNumber={dashboardData.networkCapacityStats.now.gpu - dashboardData.networkCapacityStats.compare.gpu}
-                  diffPercent={percIncrease(dashboardData.networkCapacityStats.compare.gpu, dashboardData.networkCapacityStats.now.gpu)}
-                />
-              )}
-
-            {dashboardData.networkCapacity.totalMemory !== undefined &&
-              dashboardData.networkCapacityStats.now.memory !== undefined &&
-              dashboardData.networkCapacityStats.compare.memory !== undefined && (
-                <StatsCard
-                  number={<HumanReadableBytes value={dashboardData.networkCapacity.totalMemory} />}
-                  text="Memory"
-                  diffNumberUnit={capacityMemoryDiff.unit}
-                  diffNumber={capacityMemoryDiff.value}
-                  diffPercent={percIncrease(dashboardData.networkCapacityStats.compare.memory, dashboardData.networkCapacityStats.now.memory)}
-                  graphPath={UrlService.providerGraph(ProviderSnapshotsUrlParam.memory)}
-                />
-              )}
-
-            {dashboardData.networkCapacity.totalStorage !== undefined &&
-              dashboardData.networkCapacityStats.now.storage !== undefined &&
-              dashboardData.networkCapacityStats.compare.storage !== undefined && (
-                <StatsCard
-                  number={<HumanReadableBytes value={dashboardData.networkCapacity.totalStorage} />}
-                  text="Storage"
-                  graphPath={UrlService.providerGraph(ProviderSnapshotsUrlParam.storage)}
-                  diffNumberUnit={capacityStorageDiff.unit}
-                  diffNumber={capacityStorageDiff.value}
-                  diffPercent={percIncrease(dashboardData.networkCapacityStats.compare.storage, dashboardData.networkCapacityStats.now.storage)}
-                />
-              )}
-          </div>
-        </>
-      )}
       {dashboardData.now && dashboardData.compare && (
         <>
           <Separator className="mb-8 mt-8" />

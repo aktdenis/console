@@ -4,9 +4,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@akashnetwork/ui/compo
 
 import { Dashboard } from "./Dashboard";
 
+import { NetworkCapacitySection } from "@/components/charts/NetworkCapacitySection";
+import { Title } from "@/components/Title";
 import type { DashboardData, MarketData } from "@/types";
 
-const UPCOMING_TABS = [
+const TABS = [
+  { value: "overview", label: "Overview" },
   { value: "asset-spent", label: "Asset Spent" },
   { value: "network-resources", label: "Network Resources" },
   { value: "resources-leased", label: "Resources Leased" },
@@ -15,7 +18,9 @@ const UPCOMING_TABS = [
   { value: "blockchain", label: "Blockchain" }
 ] as const;
 
-export const DEPENDENCIES = { Dashboard };
+const UPCOMING_TABS = TABS.filter(tab => tab.value !== "overview" && tab.value !== "network-resources");
+
+export const DEPENDENCIES = { Dashboard, NetworkCapacitySection };
 
 export type DashboardTabsProps = {
   dashboardData: DashboardData;
@@ -34,8 +39,7 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
   <Tabs defaultValue="overview">
     <div className="overflow-x-auto">
       <TabsList className="w-max min-w-full justify-start">
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        {UPCOMING_TABS.map(tab => (
+        {TABS.map(tab => (
           <TabsTrigger key={tab.value} value={tab.value}>
             {tab.label}
           </TabsTrigger>
@@ -45,6 +49,13 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
 
     <TabsContent value="overview">
       <d.Dashboard dashboardData={dashboardData} marketData={marketData} />
+    </TabsContent>
+
+    <TabsContent value="network-resources">
+      <Title subTitle className="mb-4">
+        Network Capacity
+      </Title>
+      <d.NetworkCapacitySection networkCapacity={dashboardData.networkCapacity} />
     </TabsContent>
 
     {UPCOMING_TABS.map(tab => (
