@@ -29,7 +29,7 @@ const RANGE_OPTIONS = [
   { key: "3M", days: 90, label: "Last 3 months", footerPhrase: "the last 3 months" },
   { key: "30D", days: 30, label: "Last 30 days", footerPhrase: "the last 30 days" },
   { key: "7D", days: 7, label: "Last 7 days", footerPhrase: "the last 7 days" },
-  { key: "24H", days: 1, label: "Last 24hr", footerPhrase: "the last 24 hours" }
+  { key: "24H", days: 2, label: "Last 24hr", footerPhrase: "the last 24 hours" }
 ] as const;
 
 const DEFAULT_RANGE_KEY: (typeof RANGE_OPTIONS)[number]["key"] = "30D";
@@ -103,6 +103,17 @@ export const SpendChart: FC<SpendChartProps> = ({
     return { percent: percIncrease(first.value, last.value), from: first.date, to: last.date };
   }, [rangedData]);
 
+  const csvData = useMemo(
+    () => ({
+      fields: [
+        { label: "Date", value: "date" },
+        { label: denom.chartLabel, value: "value" }
+      ],
+      rows: rangedData
+    }),
+    [rangedData, denom.chartLabel]
+  );
+
   return (
     <d.Card ref={cardRef} className={className}>
       <d.CardHeader className="flex flex-col items-start gap-4 space-y-0 sm:flex-row sm:justify-between">
@@ -123,9 +134,10 @@ export const SpendChart: FC<SpendChartProps> = ({
           <d.ChartRangeToggle options={RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
           <d.ChartDownloadButton
             targetRef={cardRef}
-            fileName={`${denom.key}-spend-chart.png`}
+            fileName={`${denom.key}-spend-chart`}
             title={`${denom.titlePrefix} · ${activeRange.label}`}
             subtitle={denom.description}
+            csv={csvData}
           />
         </div>
       </d.CardHeader>

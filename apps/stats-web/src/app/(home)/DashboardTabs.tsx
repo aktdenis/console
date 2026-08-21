@@ -7,8 +7,28 @@ import { Dashboard } from "./Dashboard";
 import { AssetsSpentAktSection } from "@/components/charts/AssetsSpentAktSection";
 import { AssetsSpentSection } from "@/components/charts/AssetsSpentSection";
 import { NetworkCapacitySection } from "@/components/charts/NetworkCapacitySection";
+import { LinkTiles } from "@/components/LinkTiles";
 import { Title } from "@/components/Title";
 import type { DashboardData, MarketData } from "@/types";
+
+const ASSETS_SPENT_RESOURCES = [
+  {
+    key: "bme-blog",
+    eyebrow: "Blog",
+    title: "What Burn-Mint Equilibrium Means for Akash",
+    body: "How burning AKT to mint ACT gives tenants stable USD pricing while creating deflationary demand for AKT.",
+    cta: "Read the post",
+    href: "https://akash.network/blog/what-burn-mint-equilibrium-means-for-akash/"
+  },
+  {
+    key: "bme-roadmap",
+    eyebrow: "Roadmap · AEP-76",
+    title: "Burn Mint Equilibrium On Akash",
+    body: "The proposal behind BME: a compute credit token that burns AKT to mint and burns again on settlement. Status: Final.",
+    cta: "View the proposal",
+    href: "https://akash.network/roadmap/aep-76/"
+  }
+] as const;
 
 const TABS = [
   { value: "overview", label: "Overview" },
@@ -64,6 +84,9 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
         Assets Spent (AKT&ACT)
       </Title>
       <d.AssetsSpentAktSection now={dashboardData.now} compare={dashboardData.compare} />
+
+      <p className="mb-4 mt-8 text-lg font-semibold tracking-tight text-foreground">Learn more</p>
+      <LinkTiles items={ASSETS_SPENT_RESOURCES} />
     </TabsContent>
 
     <TabsContent value="network-resources" className="mt-5">

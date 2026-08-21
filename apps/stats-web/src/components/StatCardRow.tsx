@@ -16,12 +16,9 @@ export type StatCardRowProps = {
 };
 
 export const StatCardRow: FC<StatCardRowProps> = ({ items, className }) => (
-  <div className={cn("flex w-full items-stretch", className)}>
+  <div className={cn("grid gap-6 sm:grid-cols-2", className)}>
     {items.map(item => (
-      <div
-        key={item.key}
-        className="flex flex-1 flex-col gap-2 border border-border bg-card p-6 first:rounded-tl-md last:rounded-tr-md [&:not(:first-child)]:-ml-px"
-      >
+      <div key={item.key} className="flex flex-col gap-2 rounded-md border border-border bg-card p-6 shadow-sm">
         <span className="flex items-center gap-1.5 text-sm font-medium text-card-foreground">
           {item.label}
           {item.tooltip && (

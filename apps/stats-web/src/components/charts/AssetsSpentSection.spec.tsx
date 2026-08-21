@@ -23,10 +23,10 @@ describe(AssetsSpentSection.name, () => {
     expect(screen.getByText("+13.60%")).toBeInTheDocument();
   });
 
-  it("passes the USD denom to the chart, joined to the card row above it", () => {
+  it("passes the USD denom to the chart", () => {
     const { deps } = setup({ now: mock<DashboardBlockStats>(), compare: mock<DashboardBlockStats>() });
 
-    expect(deps.SpendChartContainer.mock.calls.at(0)?.at(0)).toMatchObject({ denom: USD_DENOM, className: "rounded-t-none border-t-0" });
+    expect(deps.SpendChartContainer.mock.calls.at(0)?.at(0)).toMatchObject({ denom: USD_DENOM });
   });
 
   function setup(props: { now: DashboardBlockStats; compare: DashboardBlockStats }) {

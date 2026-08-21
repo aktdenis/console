@@ -16,20 +16,9 @@ export type AssetsSpentSectionProps = {
 };
 
 export const AssetsSpentSection: FC<AssetsSpentSectionProps> = ({ now, compare, dependencies: d = DEPENDENCIES }) => (
-  <>
+  <div className="flex flex-col gap-6">
     <StatCardRow
       items={[
-        {
-          key: "daily",
-          label: "USD Spent (24h)",
-          tooltip: "Amount spent in the last 24h (ACT + AKT converted to USD).",
-          content: (
-            <>
-              {USD_DENOM.formatAmount(udenomToDenom(now.dailyUUsdSpent))}
-              <DiffPercentageChip value={percIncrease(compare.dailyUUsdSpent, now.dailyUUsdSpent)} />
-            </>
-          )
-        },
         {
           key: "total",
           label: "Total spent USD",
@@ -40,9 +29,20 @@ export const AssetsSpentSection: FC<AssetsSpentSectionProps> = ({ now, compare, 
               <DiffPercentageChip value={percIncrease(compare.totalUUsdSpent, now.totalUUsdSpent)} />
             </>
           )
+        },
+        {
+          key: "daily",
+          label: "USD Spent (24h)",
+          tooltip: "Amount spent in the last 24h (ACT + AKT converted to USD).",
+          content: (
+            <>
+              {USD_DENOM.formatAmount(udenomToDenom(now.dailyUUsdSpent))}
+              <DiffPercentageChip value={percIncrease(compare.dailyUUsdSpent, now.dailyUUsdSpent)} />
+            </>
+          )
         }
       ]}
     />
-    <d.SpendChartContainer denom={USD_DENOM} className="rounded-t-none border-t-0" />
-  </>
+    <d.SpendChartContainer denom={USD_DENOM} />
+  </div>
 );
