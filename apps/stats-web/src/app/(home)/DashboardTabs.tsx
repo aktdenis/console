@@ -5,25 +5,45 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@akashnetwork/ui/compo
 import { Dashboard } from "./Dashboard";
 
 import { AssetsSpentAktSection } from "@/components/charts/AssetsSpentAktSection";
+import { AssetsSpentSection } from "@/components/charts/AssetsSpentSection";
 import { NetworkCapacitySection } from "@/components/charts/NetworkCapacitySection";
+import { LinkTiles } from "@/components/LinkTiles";
 import { Title } from "@/components/Title";
 import type { DashboardData, MarketData } from "@/types";
+
+const ASSETS_SPENT_RESOURCES = [
+  {
+    key: "bme-blog",
+    eyebrow: "Blog",
+    title: "What Burn-Mint Equilibrium Means for Akash",
+    body: "How burning AKT to mint ACT gives tenants stable USD pricing while creating deflationary demand for AKT.",
+    cta: "Read the post",
+    href: "https://akash.network/blog/what-burn-mint-equilibrium-means-for-akash/"
+  },
+  {
+    key: "bme-roadmap",
+    eyebrow: "Roadmap · AEP-76",
+    title: "Burn Mint Equilibrium On Akash",
+    body: "The proposal behind BME: a compute credit token that burns AKT to mint and burns again on settlement. Status: Final.",
+    cta: "View the proposal",
+    href: "https://akash.network/roadmap/aep-76/"
+  }
+] as const;
 
 const TABS = [
   { value: "overview", label: "Overview" },
   { value: "assets-spent", label: "Assets Spent" },
   { value: "network-resources", label: "Network Resources" },
   { value: "resources-leased", label: "Resources Leased" },
-  { value: "assets-spent-akt", label: "Assets Spent (AKT)" },
   { value: "bme", label: "BME" },
   { value: "blockchain", label: "Blockchain" }
 ] as const;
 
-const BUILT_TAB_VALUES = ["overview", "network-resources", "assets-spent-akt"] as const;
+const BUILT_TAB_VALUES = ["overview", "assets-spent", "network-resources"] as const;
 
 const UPCOMING_TABS = TABS.filter(tab => !BUILT_TAB_VALUES.includes(tab.value as (typeof BUILT_TAB_VALUES)[number]));
 
-export const DEPENDENCIES = { Dashboard, NetworkCapacitySection, AssetsSpentAktSection };
+export const DEPENDENCIES = { Dashboard, NetworkCapacitySection, AssetsSpentAktSection, AssetsSpentSection };
 
 export type DashboardTabsProps = {
   dashboardData: DashboardData;
@@ -54,18 +74,26 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
       <d.Dashboard dashboardData={dashboardData} marketData={marketData} />
     </TabsContent>
 
+    <TabsContent value="assets-spent" className="mt-5">
+      <Title subTitle className="mb-5 text-3xl font-bold tracking-tight sm:text-3xl">
+        Assets Spent (USD)
+      </Title>
+      <d.AssetsSpentSection now={dashboardData.now} compare={dashboardData.compare} />
+
+      <Title subTitle className="mb-5 mt-8 text-3xl font-bold tracking-tight sm:text-3xl">
+        Assets Spent (AKT&ACT)
+      </Title>
+      <d.AssetsSpentAktSection now={dashboardData.now} compare={dashboardData.compare} />
+
+      <p className="mb-4 mt-8 text-lg font-semibold tracking-tight text-foreground">Learn more</p>
+      <LinkTiles items={ASSETS_SPENT_RESOURCES} />
+    </TabsContent>
+
     <TabsContent value="network-resources" className="mt-5">
       <Title subTitle className="mb-5 text-3xl font-bold tracking-tight sm:text-3xl">
         Network Capacity
       </Title>
       <d.NetworkCapacitySection networkCapacity={dashboardData.networkCapacity} />
-    </TabsContent>
-
-    <TabsContent value="assets-spent-akt" className="mt-5">
-      <Title subTitle className="mb-5 text-3xl font-bold tracking-tight sm:text-3xl">
-        Assets Spent (AKT)
-      </Title>
-      <d.AssetsSpentAktSection now={dashboardData.now} compare={dashboardData.compare} />
     </TabsContent>
 
     {UPCOMING_TABS.map(tab => (

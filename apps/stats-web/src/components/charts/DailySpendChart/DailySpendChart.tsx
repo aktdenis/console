@@ -87,6 +87,17 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
     return { percent: percIncrease(first.dailyUsdSpent, last.dailyUsdSpent), from: first.date, to: last.date };
   }, [rangedData]);
 
+  const csvData = useMemo(
+    () => ({
+      fields: [
+        { label: "Date", value: "date" },
+        { label: "Daily USD Spent", value: "dailyUsdSpent" }
+      ],
+      rows: rangedData
+    }),
+    [rangedData]
+  );
+
   return (
     <d.Card ref={cardRef}>
       <d.CardHeader className="flex flex-col items-start gap-4 space-y-0 sm:flex-row sm:justify-between">
@@ -107,9 +118,10 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
           <d.ChartRangeToggle options={RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
           <d.ChartDownloadButton
             targetRef={cardRef}
-            fileName="usd-spend-chart.png"
+            fileName="usd-spend-chart"
             title={`USD Spent · ${activeRange.label}`}
             subtitle="Lease settlement per day, USD equivalent"
+            csv={csvData}
           />
         </div>
       </d.CardHeader>
