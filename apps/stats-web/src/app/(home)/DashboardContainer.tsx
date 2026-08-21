@@ -2,7 +2,7 @@
 import { FormattedDate, FormattedTime } from "react-intl";
 import { Spinner } from "@akashnetwork/ui/components";
 
-import { Dashboard } from "./Dashboard";
+import { DashboardTabs } from "./DashboardTabs";
 
 import { Title } from "@/components/Title";
 import { useMarketData } from "@/queries";
@@ -28,7 +28,7 @@ export const DashboardContainer: React.FunctionComponent = () => {
             </p>
           </div>
 
-          <Dashboard dashboardData={dashboardData} marketData={marketData} />
+          <DashboardTabs dashboardData={dashboardData} marketData={marketData} />
         </>
       )}
 
