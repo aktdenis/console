@@ -61,3 +61,17 @@ export const ACT_DENOM: SpendDenom = {
     </>
   )
 };
+
+export const USD_DENOM: SpendDenom = {
+  key: "usd",
+  snapshotKey: Snapshots.dailyUUsdSpent,
+  tabLabel: "USD Spent",
+  titlePrefix: "USD Spent",
+  chartLabel: "Daily USD Spent",
+  description: "Lease settlement per day, USD equivalent",
+  totalTooltip:
+    "This is the total amount spent (ACT + AKT converted to USD) to rent computing power on the akash network since the beginning of the network. (March 2021)",
+  formatTotal: value => <FormattedNumber value={value} style="currency" currency="USD" notation="compact" maximumFractionDigits={2} />,
+  formatAmount: value => <FormattedNumber value={value} style="currency" currency="USD" notation="compact" maximumFractionDigits={2} />,
+  formatTooltipAmount: value => <FormattedNumber value={value} style="currency" currency="USD" maximumFractionDigits={2} />
+};

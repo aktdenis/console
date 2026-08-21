@@ -26,6 +26,16 @@ describe(DashboardTabs.name, () => {
     expect(deps.Dashboard.mock.calls.at(0)?.at(0)).toMatchObject({ dashboardData, marketData });
   });
 
+  it("shows the Assets Spent title and section when that tab is selected", () => {
+    const { deps, dashboardData } = setup();
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Assets Spent" }));
+
+    expect(screen.getByRole("heading", { name: "Assets Spent" })).toBeInTheDocument();
+    expect(deps.AssetsSpentSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
+    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
+  });
+
   it("shows the Network Capacity title and section when the Network Resources tab is selected", () => {
     const { deps, dashboardData } = setup();
 

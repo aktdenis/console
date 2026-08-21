@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@akashnetwork/ui/compo
 import { Dashboard } from "./Dashboard";
 
 import { AssetsSpentAktSection } from "@/components/charts/AssetsSpentAktSection";
+import { AssetsSpentSection } from "@/components/charts/AssetsSpentSection";
 import { NetworkCapacitySection } from "@/components/charts/NetworkCapacitySection";
 import { Title } from "@/components/Title";
 import type { DashboardData, MarketData } from "@/types";
@@ -19,11 +20,11 @@ const TABS = [
   { value: "blockchain", label: "Blockchain" }
 ] as const;
 
-const BUILT_TAB_VALUES = ["overview", "network-resources", "assets-spent-akt"] as const;
+const BUILT_TAB_VALUES = ["overview", "assets-spent", "network-resources", "assets-spent-akt"] as const;
 
 const UPCOMING_TABS = TABS.filter(tab => !BUILT_TAB_VALUES.includes(tab.value as (typeof BUILT_TAB_VALUES)[number]));
 
-export const DEPENDENCIES = { Dashboard, NetworkCapacitySection, AssetsSpentAktSection };
+export const DEPENDENCIES = { Dashboard, NetworkCapacitySection, AssetsSpentAktSection, AssetsSpentSection };
 
 export type DashboardTabsProps = {
   dashboardData: DashboardData;
@@ -52,6 +53,13 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
 
     <TabsContent value="overview">
       <d.Dashboard dashboardData={dashboardData} marketData={marketData} />
+    </TabsContent>
+
+    <TabsContent value="assets-spent" className="mt-5">
+      <Title subTitle className="mb-5 text-3xl font-bold tracking-tight sm:text-3xl">
+        Assets Spent
+      </Title>
+      <d.AssetsSpentSection now={dashboardData.now} compare={dashboardData.compare} />
     </TabsContent>
 
     <TabsContent value="network-resources" className="mt-5">
