@@ -36,6 +36,16 @@ describe(DashboardTabs.name, () => {
     expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
   });
 
+  it("shows the Assets Spent (AKT) title and section when that tab is selected", () => {
+    const { deps, dashboardData } = setup();
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Assets Spent (AKT)" }));
+
+    expect(screen.getByRole("heading", { name: "Assets Spent (AKT)" })).toBeInTheDocument();
+    expect(deps.AssetsSpentAktSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
+    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
+  });
+
   it("switches to a placeholder when a not-yet-built tab is selected, replacing the Overview panel", () => {
     setup();
 

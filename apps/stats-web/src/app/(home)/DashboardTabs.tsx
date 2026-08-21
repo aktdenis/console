@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@akashnetwork/ui/compo
 
 import { Dashboard } from "./Dashboard";
 
+import { AssetsSpentAktSection } from "@/components/charts/AssetsSpentAktSection";
 import { NetworkCapacitySection } from "@/components/charts/NetworkCapacitySection";
 import { Title } from "@/components/Title";
 import type { DashboardData, MarketData } from "@/types";
@@ -18,9 +19,11 @@ const TABS = [
   { value: "blockchain", label: "Blockchain" }
 ] as const;
 
-const UPCOMING_TABS = TABS.filter(tab => tab.value !== "overview" && tab.value !== "network-resources");
+const BUILT_TAB_VALUES = ["overview", "network-resources", "assets-spent-akt"] as const;
 
-export const DEPENDENCIES = { Dashboard, NetworkCapacitySection };
+const UPCOMING_TABS = TABS.filter(tab => !BUILT_TAB_VALUES.includes(tab.value as (typeof BUILT_TAB_VALUES)[number]));
+
+export const DEPENDENCIES = { Dashboard, NetworkCapacitySection, AssetsSpentAktSection };
 
 export type DashboardTabsProps = {
   dashboardData: DashboardData;
@@ -56,6 +59,13 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
         Network Capacity
       </Title>
       <d.NetworkCapacitySection networkCapacity={dashboardData.networkCapacity} />
+    </TabsContent>
+
+    <TabsContent value="assets-spent-akt">
+      <Title subTitle className="mb-4">
+        Assets Spent (AKT)
+      </Title>
+      <d.AssetsSpentAktSection now={dashboardData.now} compare={dashboardData.compare} />
     </TabsContent>
 
     {UPCOMING_TABS.map(tab => (
