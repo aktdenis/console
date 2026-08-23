@@ -3,27 +3,28 @@ import { FormattedNumber } from "react-intl";
 
 import { UtilizationCard, type UtilizationRow } from "@/components/charts/UtilizationCard";
 import { bytesToShrink } from "@/lib/unitUtils";
-import type { NetworkCapacity } from "@/types";
+import type { DashboardBlockStats, NetworkCapacity } from "@/types";
 
 export const DEPENDENCIES = { UtilizationCard };
 
-export type NetworkCapacityCardProps = {
+export type ResourcesLeasedCapacityCardProps = {
+  now: DashboardBlockStats;
   networkCapacity: NetworkCapacity;
   dependencies?: typeof DEPENDENCIES;
 };
 
-export const NetworkCapacityCard: FC<NetworkCapacityCardProps> = ({ networkCapacity, dependencies: d = DEPENDENCIES }) => {
-  const memory = bytesToShrink(networkCapacity.activeMemory, true);
+export const ResourcesLeasedCapacityCard: FC<ResourcesLeasedCapacityCardProps> = ({ now, networkCapacity, dependencies: d = DEPENDENCIES }) => {
+  const memory = bytesToShrink(now.activeMemory, true);
   const totalMemory = bytesToShrink(networkCapacity.totalMemory, true);
-  const storage = bytesToShrink(networkCapacity.activeStorage, true);
+  const storage = bytesToShrink(now.activeStorage, true);
   const totalStorage = bytesToShrink(networkCapacity.totalStorage, true);
 
   const rows: UtilizationRow[] = [
     {
       key: "vcpu",
       label: "vCPU",
-      percent: networkCapacity.activeCPU / networkCapacity.totalCPU,
-      activeLabel: <FormattedNumber value={networkCapacity.activeCPU / 1000} maximumFractionDigits={1} />,
+      percent: now.activeCPU / networkCapacity.totalCPU,
+      activeLabel: <FormattedNumber value={now.activeCPU / 1000} maximumFractionDigits={1} />,
       totalLabel: (
         <>
           of <FormattedNumber value={networkCapacity.totalCPU / 1000} maximumFractionDigits={0} /> cores
@@ -33,8 +34,8 @@ export const NetworkCapacityCard: FC<NetworkCapacityCardProps> = ({ networkCapac
     {
       key: "gpu",
       label: "GPU",
-      percent: networkCapacity.activeGPU / networkCapacity.totalGPU,
-      activeLabel: <FormattedNumber value={networkCapacity.activeGPU} />,
+      percent: now.activeGPU / networkCapacity.totalGPU,
+      activeLabel: <FormattedNumber value={now.activeGPU} />,
       totalLabel: (
         <>
           of <FormattedNumber value={networkCapacity.totalGPU} /> units
@@ -44,7 +45,7 @@ export const NetworkCapacityCard: FC<NetworkCapacityCardProps> = ({ networkCapac
     {
       key: "memory",
       label: "Memory",
-      percent: networkCapacity.activeMemory / networkCapacity.totalMemory,
+      percent: now.activeMemory / networkCapacity.totalMemory,
       activeLabel: <FormattedNumber value={memory.value} maximumFractionDigits={1} />,
       totalLabel: (
         <>
@@ -55,7 +56,7 @@ export const NetworkCapacityCard: FC<NetworkCapacityCardProps> = ({ networkCapac
     {
       key: "storage",
       label: "Storage",
-      percent: networkCapacity.activeStorage / networkCapacity.totalStorage,
+      percent: now.activeStorage / networkCapacity.totalStorage,
       activeLabel: <FormattedNumber value={storage.value} maximumFractionDigits={1} />,
       totalLabel: (
         <>
@@ -65,5 +66,5 @@ export const NetworkCapacityCard: FC<NetworkCapacityCardProps> = ({ networkCapac
     }
   ];
 
-  return <d.UtilizationCard title="Network Capacity" description="Leased versus total advertised capacity" rows={rows} />;
+  return <d.UtilizationCard description="Leased versus total network capacity" rows={rows} />;
 };

@@ -6,7 +6,10 @@ import { Dashboard } from "./Dashboard";
 
 import { AssetsSpentAktSection } from "@/components/charts/AssetsSpentAktSection";
 import { AssetsSpentSection } from "@/components/charts/AssetsSpentSection";
+import { LeasesSection } from "@/components/charts/LeasesSection";
 import { NetworkCapacitySection } from "@/components/charts/NetworkCapacitySection";
+import { ResourcesLeasedCapacityCard } from "@/components/charts/ResourcesLeasedCapacityCard";
+import { ResourcesLeasedSection } from "@/components/charts/ResourcesLeasedSection";
 import { LinkTiles } from "@/components/LinkTiles";
 import { Title } from "@/components/Title";
 import type { DashboardData, MarketData } from "@/types";
@@ -39,11 +42,19 @@ const TABS = [
   { value: "blockchain", label: "Blockchain" }
 ] as const;
 
-const BUILT_TAB_VALUES = ["overview", "assets-spent", "network-resources"] as const;
+const BUILT_TAB_VALUES = ["overview", "assets-spent", "network-resources", "resources-leased"] as const;
 
 const UPCOMING_TABS = TABS.filter(tab => !BUILT_TAB_VALUES.includes(tab.value as (typeof BUILT_TAB_VALUES)[number]));
 
-export const DEPENDENCIES = { Dashboard, NetworkCapacitySection, AssetsSpentAktSection, AssetsSpentSection };
+export const DEPENDENCIES = {
+  Dashboard,
+  NetworkCapacitySection,
+  AssetsSpentAktSection,
+  AssetsSpentSection,
+  LeasesSection,
+  ResourcesLeasedCapacityCard,
+  ResourcesLeasedSection
+};
 
 export type DashboardTabsProps = {
   dashboardData: DashboardData;
@@ -94,6 +105,23 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
         Network Capacity
       </Title>
       <d.NetworkCapacitySection networkCapacity={dashboardData.networkCapacity} />
+    </TabsContent>
+
+    <TabsContent value="resources-leased" className="mt-5">
+      <Title subTitle className="mb-5 text-3xl font-bold tracking-tight sm:text-3xl">
+        Resources Leased
+      </Title>
+      <d.ResourcesLeasedCapacityCard now={dashboardData.now} networkCapacity={dashboardData.networkCapacity} />
+
+      <Title subTitle className="mb-5 mt-8 text-3xl font-bold tracking-tight sm:text-3xl">
+        Leases
+      </Title>
+      <d.LeasesSection now={dashboardData.now} compare={dashboardData.compare} />
+
+      <Title subTitle className="mb-5 mt-8 text-3xl font-bold tracking-tight sm:text-3xl">
+        Resource Usage
+      </Title>
+      <d.ResourcesLeasedSection now={dashboardData.now} compare={dashboardData.compare} />
     </TabsContent>
 
     {UPCOMING_TABS.map(tab => (

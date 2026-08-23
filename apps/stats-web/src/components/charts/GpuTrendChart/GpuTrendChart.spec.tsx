@@ -21,13 +21,13 @@ describe(GpuTrendChart.name, () => {
     const sample = daysOfSnapshots(5);
     const { deps } = setup({ completedSnapshots: sample, totalGPU: 422, isFetching: false });
 
-    expect(deps.AreaChart.mock.calls.at(-1)?.at(0)?.data).toHaveLength(5);
+    expect(deps.BarChart.mock.calls.at(-1)?.at(0)?.data).toHaveLength(5);
   });
 
   it("windows completed days to the last 30 when more history is available", () => {
     const { deps } = setup({ completedSnapshots: daysOfSnapshots(400), totalGPU: 422, isFetching: false });
 
-    expect(deps.AreaChart.mock.calls.at(-1)?.at(0)?.data).toHaveLength(30);
+    expect(deps.BarChart.mock.calls.at(-1)?.at(0)?.data).toHaveLength(30);
   });
 
   it("dims the chart while fetching", () => {
