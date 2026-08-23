@@ -20,7 +20,7 @@ import { ChartRangeToggle } from "@/components/charts/ChartRangeToggle";
 import { ChartDownloadButton } from "@/components/charts/chartSnapshot/ChartDownloadButton";
 import type { SpendDenom } from "@/components/charts/SpendChart/spendDenoms";
 import { DiffPercentageChip } from "@/components/DiffPercentageChip";
-import { percIncrease, udenomToDenom } from "@/lib/mathHelpers";
+import { percIncrease } from "@/lib/mathHelpers";
 import type { SnapshotValue } from "@/types";
 
 const RANGE_OPTIONS = [
@@ -89,11 +89,11 @@ export const SpendChart: FC<SpendChartProps> = ({
 
   const rangedData: ChartPoint[] = useMemo(() => {
     const sliceStart = Math.max(completedSnapshots.length - activeRange.days, 0);
-    return completedSnapshots.slice(sliceStart).map(snapshot => ({ date: snapshot.date, value: udenomToDenom(snapshot.value) }));
-  }, [completedSnapshots, activeRange.days]);
+    return completedSnapshots.slice(sliceStart).map(snapshot => ({ date: snapshot.date, value: denom.toDisplayValue(snapshot.value) }));
+  }, [completedSnapshots, activeRange.days, denom]);
 
   const latestCompleteDay = completedSnapshots.at(-1);
-  const latestValue = latestCompleteDay ? udenomToDenom(latestCompleteDay.value) : undefined;
+  const latestValue = latestCompleteDay ? denom.toDisplayValue(latestCompleteDay.value) : undefined;
   const latestDayDelta = percIncrease(compareValue, currentValue);
 
   const trend = useMemo(() => {

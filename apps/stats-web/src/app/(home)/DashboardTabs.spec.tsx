@@ -47,6 +47,23 @@ describe(DashboardTabs.name, () => {
     expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
   });
 
+  it("shows the leased-versus-total capacity card, titled Resources Leased, above the Leases and Resource Usage sections", () => {
+    const { deps, dashboardData } = setup();
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Resources Leased" }));
+
+    expect(screen.getByRole("heading", { name: "Resources Leased" })).toBeInTheDocument();
+    expect(deps.ResourcesLeasedCapacityCard.mock.calls.at(0)?.at(0)).toEqual({
+      now: dashboardData.now,
+      networkCapacity: dashboardData.networkCapacity
+    });
+    expect(screen.getByRole("heading", { name: "Leases" })).toBeInTheDocument();
+    expect(deps.LeasesSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
+    expect(screen.getByRole("heading", { name: "Resource Usage" })).toBeInTheDocument();
+    expect(deps.ResourcesLeasedSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
+    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
+  });
+
   it("switches to a placeholder when a not-yet-built tab is selected, replacing the Overview panel", () => {
     setup();
 
