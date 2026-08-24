@@ -2,8 +2,7 @@
 import { FormattedDate, FormattedTime } from "react-intl";
 import { Spinner } from "@akashnetwork/ui/components";
 
-import { BmeDashboard } from "./BmeDashboard";
-
+import { BmeDashboard } from "@/components/bme/BmeDashboard";
 import { Title } from "@/components/Title";
 import { useBmeDashboardData, useBmeStatusHistory } from "@/queries";
 
