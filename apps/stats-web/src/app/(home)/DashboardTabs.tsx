@@ -45,16 +45,18 @@ export type DashboardTabsProps = {
 };
 
 export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketData, dependencies: d = DEPENDENCIES }) => (
-  <Tabs defaultValue="overview">
-    <div className="overflow-x-auto">
-      <TabsList className="w-max min-w-full justify-start bg-muted">
-        {TABS.map(tab => (
-          <TabsTrigger key={tab.value} value={tab.value} className="px-2 py-1">
-            {tab.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-    </div>
+  <Tabs defaultValue="overview" className="relative flex flex-col">
+    <TabsList className="sticky bottom-[30px] z-50 order-last mx-auto mt-6 flex w-fit max-w-[calc(100vw-2rem)] items-center gap-2 overflow-x-auto rounded-xl bg-[rgba(34,34,34,0.85)] p-3 shadow-lg backdrop-blur">
+      {TABS.map(tab => (
+        <TabsTrigger
+          key={tab.value}
+          value={tab.value}
+          className="shrink-0 whitespace-nowrap rounded-lg border border-[rgb(78,78,78)] px-3 py-1.5 text-[13px] text-[rgb(222,222,222)] transition-colors data-[state=active]:border-white data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:shadow-none"
+        >
+          {tab.label}
+        </TabsTrigger>
+      ))}
+    </TabsList>
 
     <TabsContent value="overview" className="mt-5">
       <d.Dashboard dashboardData={dashboardData} marketData={marketData} />
