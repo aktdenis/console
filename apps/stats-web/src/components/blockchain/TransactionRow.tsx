@@ -1,6 +1,7 @@
 "use client";
 import { FormattedRelativeTime } from "react-intl";
 import { Badge, TableCell, TableRow } from "@akashnetwork/ui/components";
+import { BadgeCheck } from "iconoir-react";
 import Link from "next/link";
 
 import { AKTAmount } from "@/components/AKTAmount";
@@ -28,25 +29,36 @@ export const TransactionRow: React.FunctionComponent<Props> = ({ transaction, bl
           {txHash}
         </Link>
       </TableCell>
-      <TableCell align="center">
-        <Badge className="h-4 max-w-[120px] bg-primary">
+      <TableCell>
+        <Badge variant="outline" className="max-w-[120px] rounded-md font-medium">
           <span className="truncate">{firstMessageType}</span>
         </Badge>
         <span className="text-xs">{transaction.messages.length > 1 ? " +" + (transaction.messages.length - 1) : ""}</span>
       </TableCell>
       {!isSimple && (
         <>
-          <TableCell align="center">{transaction.isSuccess ? "Success" : "Failed"}</TableCell>
-          <TableCell align="center">{transaction.messages[0].amount && <AKTAmount uakt={transaction.messages[0].amount} showAKTLabel />}</TableCell>
-          <TableCell align="center">
+          <TableCell>
+            {transaction.isSuccess ? (
+              <Badge variant="info" className="gap-1 rounded-md font-medium">
+                <BadgeCheck className="size-3" />
+                Success
+              </Badge>
+            ) : (
+              <Badge variant="destructive" className="rounded-md font-medium">
+                Failed
+              </Badge>
+            )}
+          </TableCell>
+          <TableCell>{transaction.messages[0].amount && <AKTAmount uakt={transaction.messages[0].amount} showAKTLabel />}</TableCell>
+          <TableCell>
             <AKTAmount uakt={transaction.fee} showAKTLabel />
           </TableCell>
         </>
       )}
-      <TableCell align="center">
+      <TableCell>
         <Link href={UrlService.block(blockHeight)}>{blockHeight}</Link>
       </TableCell>
-      <TableCell align="center">
+      <TableCell>
         <span className="whitespace-nowrap text-sm">
           <FormattedRelativeTime
             value={(new Date(transaction.datetime).getTime() - new Date().getTime()) / 1000}

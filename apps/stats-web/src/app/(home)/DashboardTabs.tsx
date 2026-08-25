@@ -7,6 +7,7 @@ import { Dashboard } from "./Dashboard";
 import { BME_LEARN_MORE_RESOURCES } from "@/components/bme/bmeLearnMoreResources";
 import { AssetsSpentAktSection } from "@/components/charts/AssetsSpentAktSection";
 import { AssetsSpentSection } from "@/components/charts/AssetsSpentSection";
+import { BlockchainSection } from "@/components/charts/BlockchainSection";
 import { BmeSection } from "@/components/charts/BmeSection";
 import { LeasesSection } from "@/components/charts/LeasesSection";
 import { NetworkCapacitySection } from "@/components/charts/NetworkCapacitySection";
@@ -25,15 +26,12 @@ const TABS = [
   { value: "blockchain", label: "Blockchain" }
 ] as const;
 
-const BUILT_TAB_VALUES = ["overview", "assets-spent", "network-resources", "resources-leased", "bme"] as const;
-
-const UPCOMING_TABS = TABS.filter(tab => !BUILT_TAB_VALUES.includes(tab.value as (typeof BUILT_TAB_VALUES)[number]));
-
 export const DEPENDENCIES = {
   Dashboard,
   NetworkCapacitySection,
   AssetsSpentAktSection,
   AssetsSpentSection,
+  BlockchainSection,
   BmeSection,
   LeasesSection,
   ResourcesLeasedCapacityCard,
@@ -45,13 +43,6 @@ export type DashboardTabsProps = {
   marketData: MarketData;
   dependencies?: typeof DEPENDENCIES;
 };
-
-const UpcomingTabPlaceholder: FC<{ label: string }> = ({ label }) => (
-  <div className="flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed p-12 text-center">
-    <p className="text-sm font-medium text-foreground">{label}</p>
-    <p className="text-sm text-muted-foreground">This section is being rebuilt to match the updated design. Check back soon.</p>
-  </div>
-);
 
 export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketData, dependencies: d = DEPENDENCIES }) => (
   <Tabs defaultValue="overview">
@@ -112,10 +103,11 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
       <d.BmeSection />
     </TabsContent>
 
-    {UPCOMING_TABS.map(tab => (
-      <TabsContent key={tab.value} value={tab.value}>
-        <UpcomingTabPlaceholder label={tab.label} />
-      </TabsContent>
-    ))}
+    <TabsContent value="blockchain" className="mt-5">
+      <Title subTitle className="mb-5 text-3xl font-bold tracking-tight sm:text-3xl">
+        Blockchain
+      </Title>
+      <d.BlockchainSection chainStats={dashboardData.chainStats} />
+    </TabsContent>
   </Tabs>
 );

@@ -95,7 +95,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className={theme} style={{ colorScheme: theme }} suppressHydrationWarning>
       <GoogleAnalytics />
 
-      <body className={cn("min-h-screen bg-background font-sans tracking-wide antialiased", GeistSans.variable)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", GeistSans.variable)}>
         <Providers nonce={nonce}>
           <Nav />
           <div className="flex min-h-[calc(100vh-60px)] flex-col justify-between">

@@ -1,12 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button, Card, CardContent, Input } from "@akashnetwork/ui/components";
+import { Card, CardContent, Input } from "@akashnetwork/ui/components";
 import { fromBech32, normalizeBech32 } from "@cosmjs/encoding";
-import { Search, Xmark } from "iconoir-react";
+import { Search } from "iconoir-react";
 import { useRouter } from "next/navigation";
-import { useMediaQuery } from "usehooks-ts";
 
-import { breakpoints } from "@/lib/responsiveUtils";
 import { UrlService } from "@/lib/urlUtils";
 
 enum SearchType {
@@ -21,8 +19,6 @@ const SearchBar: React.FunctionComponent = () => {
   const [searchType, setSearchType] = useState<SearchType | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const router = useRouter();
-  const hasSearchTerms = !!searchTerms.trim();
-  const smallScreen = useMediaQuery(breakpoints.xs.mediaQuery);
 
   useEffect(() => {
     setSearchType(getSearchType(searchTerms));
@@ -87,61 +83,19 @@ const SearchBar: React.FunctionComponent = () => {
     }
   }
 
-  function getSearchBtnLabel(searchType: SearchType | null) {
-    switch (searchType) {
-      case SearchType.AccountAddress:
-        return "Search Account";
-      case SearchType.ValidatorAddress:
-        return "Search Validator";
-      case SearchType.TxHash:
-        return "Search Transaction";
-      case SearchType.BlockHeight:
-        return "Search Block";
-      default:
-        return "Search";
-    }
-  }
-
-  const onClear = () => {
-    setSearchTerms("");
-    setSearchType(null);
-  };
-
   return (
     <div className="relative flex-grow">
       <form onSubmit={onSubmit}>
-        <label className="relative block text-gray-400 focus-within:text-gray-600">
-          <Input
-            value={searchTerms}
-            onChange={onSearchTermsChange}
-            onClick={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            placeholder="Search by Address, Block Height, TxHash..."
-          />
-
-          <div className="absolute right-0 top-0 flex items-center">
-            {hasSearchTerms && (
-              <Button
-                type="button"
-                size="icon"
-                onClick={onClear}
-                className="bg-transparent text-gray-400 hover:bg-transparent hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-              >
-                <Xmark />
-              </Button>
-            )}
-
-            {smallScreen ? (
-              <Button variant="default" size="icon" type="submit" disabled={searchType === null || !hasSearchTerms} className="ml-2">
-                <Search />
-              </Button>
-            ) : (
-              <Button type="submit" disabled={searchType === null || !hasSearchTerms} className="ml-2">
-                {getSearchBtnLabel(searchType)}
-              </Button>
-            )}
-          </div>
-        </label>
+        <Input
+          type="search"
+          value={searchTerms}
+          onChange={onSearchTermsChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder="Search by Address, Block Height, TxHash"
+          startIcon={<Search className="size-4 text-muted-foreground" />}
+          startIconClassName="pl-3"
+        />
 
         {searchType === null && searchTerms.trim() && isFocused && (
           <div className="absolute -bottom-14 left-0 w-full">

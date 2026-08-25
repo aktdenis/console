@@ -1,14 +1,8 @@
 "use client";
 import { Card, CardContent, Spinner, Table, TableBody, TableHead, TableHeader, TableRow } from "@akashnetwork/ui/components";
-import type { Metadata } from "next";
 
-import { BlockRow } from "../../components/blockchain/BlockRow";
-
+import { BlockRow } from "@/components/blockchain/BlockRow";
 import { useBlocks } from "@/queries";
-
-export const metadata: Metadata = {
-  title: "Blocks"
-};
 
 export const BlocksTable: React.FunctionComponent = () => {
   const { data: blocks, isLoading } = useBlocks(20, {
@@ -16,8 +10,8 @@ export const BlocksTable: React.FunctionComponent = () => {
   });
 
   return (
-    <Card className="flex w-full flex-col justify-between">
-      <CardContent>
+    <Card className="flex w-full flex-col justify-between overflow-hidden">
+      <CardContent className="px-0">
         <div>
           {isLoading ? (
             <div className="flex items-center justify-center pt-8">
@@ -27,10 +21,10 @@ export const BlocksTable: React.FunctionComponent = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-1/4 text-center">Height</TableHead>
-                  <TableHead className="w-1/3 text-center">Proposer</TableHead>
-                  <TableHead className="w-1/5 text-center">Transactions</TableHead>
-                  <TableHead className="w-1/5 text-center">Time</TableHead>
+                  <TableHead className="w-1/4">Height</TableHead>
+                  <TableHead className="w-1/3">Proposer</TableHead>
+                  <TableHead className="w-1/5">Transactions</TableHead>
+                  <TableHead className="w-1/5">Time</TableHead>
                 </TableRow>
               </TableHeader>
 
