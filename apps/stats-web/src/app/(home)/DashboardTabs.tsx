@@ -4,8 +4,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@akashnetwork/ui/compo
 
 import { Dashboard } from "./Dashboard";
 
+import { BME_LEARN_MORE_RESOURCES } from "@/components/bme/bmeLearnMoreResources";
 import { AssetsSpentAktSection } from "@/components/charts/AssetsSpentAktSection";
 import { AssetsSpentSection } from "@/components/charts/AssetsSpentSection";
+import { BmeSection } from "@/components/charts/BmeSection";
 import { LeasesSection } from "@/components/charts/LeasesSection";
 import { NetworkCapacitySection } from "@/components/charts/NetworkCapacitySection";
 import { ResourcesLeasedCapacityCard } from "@/components/charts/ResourcesLeasedCapacityCard";
@@ -13,25 +15,6 @@ import { ResourcesLeasedSection } from "@/components/charts/ResourcesLeasedSecti
 import { LinkTiles } from "@/components/LinkTiles";
 import { Title } from "@/components/Title";
 import type { DashboardData, MarketData } from "@/types";
-
-const ASSETS_SPENT_RESOURCES = [
-  {
-    key: "bme-blog",
-    eyebrow: "Blog",
-    title: "What Burn-Mint Equilibrium Means for Akash",
-    body: "How burning AKT to mint ACT gives tenants stable USD pricing while creating deflationary demand for AKT.",
-    cta: "Read the post",
-    href: "https://akash.network/blog/what-burn-mint-equilibrium-means-for-akash/"
-  },
-  {
-    key: "bme-roadmap",
-    eyebrow: "Roadmap · AEP-76",
-    title: "Burn Mint Equilibrium On Akash",
-    body: "The proposal behind BME: a compute credit token that burns AKT to mint and burns again on settlement. Status: Final.",
-    cta: "View the proposal",
-    href: "https://akash.network/roadmap/aep-76/"
-  }
-] as const;
 
 const TABS = [
   { value: "overview", label: "Overview" },
@@ -42,7 +25,7 @@ const TABS = [
   { value: "blockchain", label: "Blockchain" }
 ] as const;
 
-const BUILT_TAB_VALUES = ["overview", "assets-spent", "network-resources", "resources-leased"] as const;
+const BUILT_TAB_VALUES = ["overview", "assets-spent", "network-resources", "resources-leased", "bme"] as const;
 
 const UPCOMING_TABS = TABS.filter(tab => !BUILT_TAB_VALUES.includes(tab.value as (typeof BUILT_TAB_VALUES)[number]));
 
@@ -51,6 +34,7 @@ export const DEPENDENCIES = {
   NetworkCapacitySection,
   AssetsSpentAktSection,
   AssetsSpentSection,
+  BmeSection,
   LeasesSection,
   ResourcesLeasedCapacityCard,
   ResourcesLeasedSection
@@ -97,7 +81,7 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
       <d.AssetsSpentAktSection now={dashboardData.now} compare={dashboardData.compare} />
 
       <p className="mb-4 mt-8 text-lg font-semibold tracking-tight text-foreground">Learn more</p>
-      <LinkTiles items={ASSETS_SPENT_RESOURCES} />
+      <LinkTiles items={BME_LEARN_MORE_RESOURCES} />
     </TabsContent>
 
     <TabsContent value="network-resources" className="mt-5">
@@ -122,6 +106,10 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
         Resource Usage
       </Title>
       <d.ResourcesLeasedSection now={dashboardData.now} compare={dashboardData.compare} />
+    </TabsContent>
+
+    <TabsContent value="bme" className="mt-5">
+      <d.BmeSection />
     </TabsContent>
 
     {UPCOMING_TABS.map(tab => (

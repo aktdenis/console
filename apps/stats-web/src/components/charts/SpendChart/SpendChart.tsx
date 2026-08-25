@@ -14,7 +14,7 @@ import {
 } from "@akashnetwork/ui/components";
 import { cn } from "@akashnetwork/ui/utils";
 import { format, parseISO } from "date-fns";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import { ChartRangeToggle } from "@/components/charts/ChartRangeToggle";
 import { ChartDownloadButton } from "@/components/charts/chartSnapshot/ChartDownloadButton";
@@ -49,9 +49,11 @@ export const DEPENDENCIES = {
   ChartRangeToggle,
   ChartDownloadButton,
   AreaChart,
+  BarChart,
   CartesianGrid,
   XAxis,
   Area,
+  Bar,
   DiffPercentageChip
 };
 
@@ -144,33 +146,63 @@ export const SpendChart: FC<SpendChartProps> = ({
 
       <d.CardContent>
         <d.ChartContainer config={chartConfig} className={cn("aspect-auto h-[230px] w-full", isFetching && "pointer-events-none opacity-80")}>
-          <d.AreaChart accessibilityLayer data={rangedData} margin={{ left: 12, right: 12 }}>
-            <d.CartesianGrid vertical={false} />
-            <d.XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              minTickGap={40}
-              tickFormatter={value => {
-                const date = parseISO(value);
-                return isNaN(date.getTime()) ? value : format(date, "d MMM");
-              }}
-            />
-            <d.ChartTooltip
-              content={
-                <d.ChartTooltipContent
-                  nameKey="value"
-                  labelFormatter={value => {
-                    const date = parseISO(value);
-                    return isNaN(date.getTime()) ? value : format(date, "MMM d, yyyy");
-                  }}
-                  formatter={value => denom.formatTooltipAmount(Number(value))}
-                />
-              }
-            />
-            <d.Area dataKey="value" type="monotone" stroke="var(--color-value)" fill="var(--color-value)" fillOpacity={0.15} strokeWidth={2} />
-          </d.AreaChart>
+          {denom.chartType === "bar" ? (
+            <d.BarChart accessibilityLayer data={rangedData} margin={{ left: 12, right: 12 }}>
+              <d.CartesianGrid vertical={false} />
+              <d.XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                minTickGap={40}
+                tickFormatter={value => {
+                  const date = parseISO(value);
+                  return isNaN(date.getTime()) ? value : format(date, "d MMM");
+                }}
+              />
+              <d.ChartTooltip
+                content={
+                  <d.ChartTooltipContent
+                    nameKey="value"
+                    labelFormatter={value => {
+                      const date = parseISO(value);
+                      return isNaN(date.getTime()) ? value : format(date, "MMM d, yyyy");
+                    }}
+                    formatter={value => denom.formatTooltipAmount(Number(value))}
+                  />
+                }
+              />
+              <d.Bar dataKey="value" fill="var(--color-value)" radius={3} />
+            </d.BarChart>
+          ) : (
+            <d.AreaChart accessibilityLayer data={rangedData} margin={{ left: 12, right: 12 }}>
+              <d.CartesianGrid vertical={false} />
+              <d.XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                minTickGap={40}
+                tickFormatter={value => {
+                  const date = parseISO(value);
+                  return isNaN(date.getTime()) ? value : format(date, "d MMM");
+                }}
+              />
+              <d.ChartTooltip
+                content={
+                  <d.ChartTooltipContent
+                    nameKey="value"
+                    labelFormatter={value => {
+                      const date = parseISO(value);
+                      return isNaN(date.getTime()) ? value : format(date, "MMM d, yyyy");
+                    }}
+                    formatter={value => denom.formatTooltipAmount(Number(value))}
+                  />
+                }
+              />
+              <d.Area dataKey="value" type="monotone" stroke="var(--color-value)" fill="var(--color-value)" fillOpacity={0.15} strokeWidth={2} />
+            </d.AreaChart>
+          )}
         </d.ChartContainer>
       </d.CardContent>
 

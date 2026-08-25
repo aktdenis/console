@@ -64,10 +64,19 @@ describe(DashboardTabs.name, () => {
     expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
   });
 
+  it("shows the BME section when that tab is selected", () => {
+    const { deps } = setup();
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "BME" }));
+
+    expect(deps.BmeSection).toHaveBeenCalled();
+    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
+  });
+
   it("switches to a placeholder when a not-yet-built tab is selected, replacing the Overview panel", () => {
     setup();
 
-    fireEvent.mouseDown(screen.getByRole("tab", { name: "BME" }));
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Blockchain" }));
 
     expect(screen.getByText("This section is being rebuilt to match the updated design. Check back soon.")).toBeInTheDocument();
     expect(screen.queryByRole("tabpanel", { name: "Overview" })).not.toBeInTheDocument();

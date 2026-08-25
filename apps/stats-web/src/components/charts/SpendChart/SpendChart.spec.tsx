@@ -3,7 +3,7 @@ import { IntlProvider } from "react-intl";
 import { describe, expect, it } from "vitest";
 
 import { DEPENDENCIES, SpendChart, type SpendChartProps } from "@/components/charts/SpendChart/SpendChart";
-import { ACT_DENOM, AKT_DENOM } from "@/components/charts/SpendChart/spendDenoms";
+import { ACT_DENOM, AKT_DENOM, NET_AKT_BURNED_DENOM } from "@/components/charts/SpendChart/spendDenoms";
 import type { SnapshotValue } from "@/types";
 import { render } from "@testing-library/react";
 import { MockComponents } from "@tests/unit/mocks";
@@ -86,6 +86,20 @@ describe(SpendChart.name, () => {
 
     expect(container.textContent).toContain("$10");
     expect(container.textContent).toContain("ACT");
+  });
+
+  it("renders an area chart for a denom with chartType 'area'", () => {
+    const { deps } = setup({ denom: AKT_DENOM, completedSnapshots: daysOfSnapshots(5), currentValue: 0, compareValue: 0, isFetching: false });
+
+    expect(deps.AreaChart).toHaveBeenCalled();
+    expect(deps.BarChart).not.toHaveBeenCalled();
+  });
+
+  it("renders a bar chart for a denom with chartType 'bar', for values that can go negative", () => {
+    const { deps } = setup({ denom: NET_AKT_BURNED_DENOM, completedSnapshots: daysOfSnapshots(5), currentValue: 0, compareValue: 0, isFetching: false });
+
+    expect(deps.BarChart).toHaveBeenCalled();
+    expect(deps.AreaChart).not.toHaveBeenCalled();
   });
 
   it("dims the chart while fetching", () => {
