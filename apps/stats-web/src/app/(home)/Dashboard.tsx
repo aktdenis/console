@@ -81,10 +81,6 @@ export const Dashboard: React.FunctionComponent<IDashboardProps> = ({ dashboardD
       {/* <Separator className="mb-8 mt-8" /> */}
       {dashboardData.now && dashboardData.compare && (
         <>
-          <Title subTitle className="mb-4">
-            Network Summary
-          </Title>
-
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {dashboardData.now.dailyUUsdSpent !== undefined && dashboardData.compare.dailyUUsdSpent !== undefined && (
               <StatsCard
