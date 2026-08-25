@@ -11,7 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@akashnetwork/ui/components";
-import { ArrowUpRightSquare, Discord, Github, MoreVert, X as TwitterX } from "iconoir-react";
+import { ArrowUpRightSquare, Discord, Github, X as TwitterX } from "iconoir-react";
+import { MoreVertical } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 
@@ -32,7 +33,7 @@ export const MoreMenu = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-          <MoreVert className="size-4" />
+          <MoreVertical className="size-4" />
           <span className="sr-only">More options</span>
         </Button>
       </DropdownMenuTrigger>
