@@ -42,12 +42,6 @@ export const Nav = () => {
           </div>
 
           <nav className="hidden items-center gap-2 md:flex">
-            <Link href="/bme">
-              <Button variant="ghost" size="sm">
-                BME
-              </Button>
-            </Link>
-
             <NetworkSelect />
 
             <Link rel="noreferrer" href="https://console.akash.network" passHref target="_blank">
