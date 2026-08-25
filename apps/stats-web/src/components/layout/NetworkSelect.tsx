@@ -12,12 +12,13 @@ interface NetworkSelectProps {
 const NetworkSelect: React.FC<NetworkSelectProps> = ({ className }) => {
   const [{ isLoading: isLoadingNetworks, data: networks }] = networkStore.useNetworksStore();
   const [selectedNetworkId, setSelectedNetworkId] = networkStore.useSelectedNetworkIdStore({ reloadOnChange: true });
+  const selectedNetwork = networkStore.useSelectedNetwork();
 
   return (
     <Select value={selectedNetworkId} disabled={isLoadingNetworks} onValueChange={setSelectedNetworkId}>
       <SelectTrigger className={cn("h-[30px] min-w-[180px] max-w-[200px]", className)}>
         {isLoadingNetworks && <Spinner size="small" />}
-        <SelectValue placeholder="Select network" />
+        <SelectValue placeholder="Select network">{`Select env.: ${selectedNetwork.title}`}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

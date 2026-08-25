@@ -1,11 +1,10 @@
 "use client";
 import { Button } from "@akashnetwork/ui/components";
-import { Discord, Github, Rocket, X as TwitterX } from "iconoir-react";
 import Link from "next/link";
 
 import { AkashConsoleDarkLogo, AkashConsoleLightLogo } from "../icons/AkashConsoleLogo";
-import { ModeToggle } from "../ModeToggle";
 import { MobileNav } from "./MobileNav";
+import { MoreMenu } from "./MoreMenu";
 
 const NetworkSelect = dynamic(() => import("./NetworkSelect"), {
   ssr: false
@@ -31,62 +30,33 @@ export const Nav = () => {
       )}
 
       <div className="container flex h-14 items-center">
-        <div className="mr-4 flex">
-          {!!theme && (
-            <Link className="flex items-center space-x-2" href="/">
-              {theme === "light" ? <AkashConsoleLightLogo className="h-[25px] max-w-[180px]" /> : <AkashConsoleDarkLogo className="h-[25px] max-w-[180px]" />}
-            </Link>
-          )}
-
-          <div className="ml-8 hidden items-center gap-4 md:flex">
-            <NetworkSelect />
-            <Link href="/bme" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-              BME
-            </Link>
-          </div>
-        </div>
+        {!!theme && (
+          <Link className="flex items-center space-x-2" href="/">
+            {theme === "light" ? <AkashConsoleLightLogo className="h-[25px] max-w-[180px]" /> : <AkashConsoleDarkLogo className="h-[25px] max-w-[180px]" />}
+          </Link>
+        )}
 
         <div className="flex flex-1 items-center justify-end">
           <div className="md:hidden">
             <MobileNav />
           </div>
 
-          <nav className="hidden items-center md:flex">
-            <Link target="_blank" rel="noreferrer" href="https://twitter.com/akashnet" className="text-foreground">
-              <Button variant="ghost" size="icon">
-                <TwitterX width="1.2rem" height="1.2rem" />
-                <span className="sr-only">Twitter</span>
+          <nav className="hidden items-center gap-2 md:flex">
+            <Link href="/bme">
+              <Button variant="ghost" size="sm">
+                BME
               </Button>
             </Link>
 
-            <Link target="_blank" rel="noreferrer" href="https://github.com/akash-network/console" className="text-foreground">
-              <Button variant="ghost" size="icon">
-                <Github width="1.2rem" height="1.2rem" />
-                <span className="sr-only">GitHub</span>
-              </Button>
-            </Link>
+            <NetworkSelect />
 
-            <Link target="_blank" rel="noreferrer" href="https://discord.akash.network" className="text-foreground">
-              <Button variant="ghost" size="icon">
-                <Discord width="1.2rem" height="1.2rem" />
-                <span className="sr-only">Twitter</span>
-              </Button>
-            </Link>
-
-            <ModeToggle />
-
-            <Link rel="noreferrer" href="https://akash.network" passHref target="_blank" className="ml-4 text-foreground">
-              <Button variant="outline" size="sm" className="h-[30px]">
-                akash.network
-              </Button>
-            </Link>
-
-            <Link rel="noreferrer" href="https://console.akash.network" passHref target="_blank" className="ml-4">
+            <Link rel="noreferrer" href="https://console.akash.network" passHref target="_blank">
               <Button variant="default" size="sm" className="h-[30px]">
-                Deploy
-                <Rocket className="ml-2 rotate-45" />
+                Deploy Now
               </Button>
             </Link>
+
+            <MoreMenu />
           </nav>
         </div>
       </div>
