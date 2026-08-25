@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
-import { TransactionsTable } from "./TransactionsTable";
-
+import { TransactionsTable } from "@/components/blockchain/TransactionsTable";
 import { PageContainer } from "@/components/PageContainer";
 import { Title } from "@/components/Title";
 

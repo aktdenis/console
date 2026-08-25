@@ -1,13 +1,8 @@
 "use client";
 import { Card, CardContent, Spinner, Table, TableBody, TableHead, TableHeader, TableRow } from "@akashnetwork/ui/components";
-import type { Metadata } from "next";
 
 import { TransactionRow } from "@/components/blockchain/TransactionRow";
 import { useTransactions } from "@/queries";
-
-export const metadata: Metadata = {
-  title: "Blocks"
-};
 
 export const TransactionsTable: React.FunctionComponent = () => {
   const { data: transactions, isLoading } = useTransactions(20, {
@@ -15,8 +10,8 @@ export const TransactionsTable: React.FunctionComponent = () => {
   });
 
   return (
-    <Card className="flex w-full flex-col justify-between">
-      <CardContent>
+    <Card className="flex w-full flex-col justify-between overflow-hidden">
+      <CardContent className="px-0">
         <div>
           {isLoading ? (
             <div className="flex items-center justify-center pt-8">
@@ -27,12 +22,12 @@ export const TransactionsTable: React.FunctionComponent = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Tx Hash</TableHead>
-                  <TableHead className="text-center">Type</TableHead>
-                  <TableHead className="text-center">Result</TableHead>
-                  <TableHead className="text-center">Amount</TableHead>
-                  <TableHead className="text-center">Fee</TableHead>
-                  <TableHead className="text-center">Height</TableHead>
-                  <TableHead className="text-center">Time</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Result</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Fee</TableHead>
+                  <TableHead>Height</TableHead>
+                  <TableHead>Time</TableHead>
                 </TableRow>
               </TableHeader>
 

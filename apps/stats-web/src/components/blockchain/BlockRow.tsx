@@ -5,7 +5,6 @@ import Link from "next/link";
 
 import { getShortText } from "@/hooks/useShortText";
 import { UrlService } from "@/lib/urlUtils";
-import { cn } from "@/lib/utils";
 import type { Block } from "@/types";
 
 type Props = {
@@ -16,21 +15,16 @@ type Props = {
 export const BlockRow: React.FunctionComponent<Props> = ({ block }) => {
   return (
     <TableRow>
-      <TableCell align="center">
+      <TableCell>
         <Link href={UrlService.block(block.height)}>{block.height}</Link>
       </TableCell>
-      <TableCell align="center">
+      <TableCell>
         <Link href={UrlService.validator(block.proposer.operatorAddress)}>
           <span className="max-[150px] line-clamp-1">{getShortText(block.proposer.moniker, 20)}</span>
         </Link>
       </TableCell>
-      <TableCell
-        align="center"
-        className={cn({ "text-red-500": block.transactionCount > 0, "font-bold": block.transactionCount > 0, "opacity-30": block.transactionCount === 0 })}
-      >
-        {block.transactionCount}
-      </TableCell>
-      <TableCell align="center" className="whitespace-nowrap">
+      <TableCell>{block.transactionCount}</TableCell>
+      <TableCell className="whitespace-nowrap">
         <span className="text-sm">
           <FormattedRelativeTime
             value={(new Date(block.datetime).getTime() - new Date().getTime()) / 1000}

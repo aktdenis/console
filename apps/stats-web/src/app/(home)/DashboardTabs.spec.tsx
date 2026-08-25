@@ -34,7 +34,6 @@ describe(DashboardTabs.name, () => {
     expect(deps.AssetsSpentSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
     expect(screen.getByRole("heading", { name: "Assets Spent (AKT&ACT)" })).toBeInTheDocument();
     expect(deps.AssetsSpentAktSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
-    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
   });
 
   it("shows the Network Capacity title and section when the Network Resources tab is selected", () => {
@@ -44,7 +43,6 @@ describe(DashboardTabs.name, () => {
 
     expect(screen.getByText("Network Capacity")).toBeInTheDocument();
     expect(deps.NetworkCapacitySection.mock.calls.at(0)?.at(0)).toEqual({ networkCapacity: dashboardData.networkCapacity });
-    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
   });
 
   it("shows the leased-versus-total capacity card, titled Resources Leased, above the Leases and Resource Usage sections", () => {
@@ -61,7 +59,6 @@ describe(DashboardTabs.name, () => {
     expect(deps.LeasesSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
     expect(screen.getByRole("heading", { name: "Resource Usage" })).toBeInTheDocument();
     expect(deps.ResourcesLeasedSection.mock.calls.at(0)?.at(0)).toEqual({ now: dashboardData.now, compare: dashboardData.compare });
-    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
   });
 
   it("shows the BME section when that tab is selected", () => {
@@ -70,16 +67,15 @@ describe(DashboardTabs.name, () => {
     fireEvent.mouseDown(screen.getByRole("tab", { name: "BME" }));
 
     expect(deps.BmeSection).toHaveBeenCalled();
-    expect(screen.queryByText("This section is being rebuilt to match the updated design. Check back soon.")).not.toBeInTheDocument();
   });
 
-  it("switches to a placeholder when a not-yet-built tab is selected, replacing the Overview panel", () => {
-    setup();
+  it("shows the Blockchain title and section, passing it the chain stats, when that tab is selected", () => {
+    const { deps, dashboardData } = setup();
 
     fireEvent.mouseDown(screen.getByRole("tab", { name: "Blockchain" }));
 
-    expect(screen.getByText("This section is being rebuilt to match the updated design. Check back soon.")).toBeInTheDocument();
-    expect(screen.queryByRole("tabpanel", { name: "Overview" })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Blockchain" })).toBeInTheDocument();
+    expect(deps.BlockchainSection.mock.calls.at(0)?.at(0)).toEqual({ chainStats: dashboardData.chainStats });
   });
 
   it("returns to the Overview tab's content after visiting another tab", () => {
