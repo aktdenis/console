@@ -122,9 +122,9 @@ export const OverviewStatsCarousel: React.FunctionComponent<IOverviewStatsCarous
 
   return (
     <Carousel opts={{ align: "start", loop: true }} plugins={[AutoScroll({ speed: 1, stopOnInteraction: false })]} className="w-full">
-      <CarouselContent>
+      <CarouselContent className="-ml-2">
         {visibleItems.map(item => (
-          <CarouselItem key={item.key} className="basis-1/2 sm:basis-1/3 lg:basis-1/4">
+          <CarouselItem key={item.key} className="basis-1/2 pl-2 sm:basis-1/3 lg:basis-1/4">
             <CarouselStatCard number={item.number} text={item.text} diffPercent={item.diffPercent} trend={item.trend} periodLabel="this 7D" />
           </CarouselItem>
         ))}
