@@ -8,7 +8,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MockComponents } from "@tests/unit/mocks";
 
 describe(DashboardTabs.name, () => {
-  it("renders a trigger for all six tabs", () => {
+  it("renders a trigger for all seven tabs", () => {
     setup();
 
     expect(screen.getByRole("tab", { name: "Overview" })).toBeInTheDocument();
@@ -17,6 +17,7 @@ describe(DashboardTabs.name, () => {
     expect(screen.getByRole("tab", { name: "Resources Leased" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "BME" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Blockchain" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Provider Network" })).toBeInTheDocument();
   });
 
   it("shows the Overview tab's content by default and forwards dashboard and market data to it", () => {
@@ -76,6 +77,14 @@ describe(DashboardTabs.name, () => {
 
     expect(screen.getByRole("heading", { name: "Blockchain" })).toBeInTheDocument();
     expect(deps.BlockchainSection.mock.calls.at(0)?.at(0)).toEqual({ chainStats: dashboardData.chainStats });
+  });
+
+  it("shows the Ecosystem section when that tab is selected", () => {
+    const { deps } = setup();
+
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Provider Network" }));
+
+    expect(deps.EcosystemSection).toHaveBeenCalled();
   });
 
   it("returns to the Overview tab's content after visiting another tab", () => {

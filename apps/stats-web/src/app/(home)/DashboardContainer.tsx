@@ -12,7 +12,7 @@ export const DashboardContainer: React.FunctionComponent = () => {
   const isLoading = isLoadingMarketData || isLoadingDashboardData;
 
   return (
-    <div className="mt-8">
+    <div className="mt-4">
       {dashboardData && marketData && <DashboardTabs dashboardData={dashboardData} marketData={marketData} />}
 
       {isLoading && !dashboardData && (
