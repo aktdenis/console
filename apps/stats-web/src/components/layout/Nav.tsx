@@ -5,13 +5,6 @@ import Link from "next/link";
 import { AkashConsoleDarkLogo, AkashConsoleLightLogo } from "../icons/AkashConsoleLogo";
 import { MobileNav } from "./MobileNav";
 import { MoreMenu } from "./MoreMenu";
-
-const NetworkSelect = dynamic(() => import("./NetworkSelect"), {
-  ssr: false
-});
-
-import dynamic from "next/dynamic";
-
 import { TopBanner } from "./TopBanner";
 
 import useCookieTheme from "@/hooks/useTheme";
@@ -42,10 +35,8 @@ export const Nav = () => {
           </div>
 
           <nav className="hidden items-center gap-2 md:flex">
-            <NetworkSelect />
-
             <Link rel="noreferrer" href="https://console.akash.network" passHref target="_blank">
-              <Button variant="default" size="sm" className="h-[30px]">
+              <Button variant="default" size="sm" className="h-[30px] hover:no-underline">
                 Deploy Now
               </Button>
             </Link>
