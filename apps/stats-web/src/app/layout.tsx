@@ -2,6 +2,7 @@ import "@akashnetwork/ui/styles";
 import "../styles/index.css";
 
 import { cn } from "@akashnetwork/ui/utils";
+import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata, Viewport } from "next";
 import { cookies, headers } from "next/headers";
@@ -95,7 +96,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className={theme} style={{ colorScheme: theme }} suppressHydrationWarning>
       <GoogleAnalytics />
 
-      <body className={cn("min-h-screen bg-background font-sans antialiased", GeistSans.variable)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", GeistSans.variable, GeistMono.variable)}>
         <Providers nonce={nonce}>
           <Nav />
           <div className="flex min-h-[calc(100vh-60px)] flex-col justify-between">

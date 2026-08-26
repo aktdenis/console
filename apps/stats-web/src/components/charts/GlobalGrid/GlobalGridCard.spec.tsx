@@ -12,8 +12,8 @@ const utilizationRows: GlobalGridCardProps["utilizationRows"] = [
 ];
 
 const featuredProviders: GlobalGridCardProps["featuredProviders"] = [
-  { owner: "akash1abc", name: "provider.example.com", region: "US-East, US", gpuModels: ["h100"] },
-  { owner: "akash1def", name: "provider.other.io", region: "NSW, AU", gpuModels: ["a100"] }
+  { owner: "akash1abc", name: "provider.example.com", region: "US-East, US", gpuModels: [{ vendor: "nvidia", model: "h100", ram: "80Gi", interface: "SXM5" }] },
+  { owner: "akash1def", name: "provider.other.io", region: "NSW, AU", gpuModels: [{ vendor: "nvidia", model: "a100", ram: "80Gi", interface: "SXM4" }] }
 ];
 
 describe(GlobalGridCard.name, () => {

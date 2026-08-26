@@ -1,3 +1,10 @@
+export type GpuModelInfo = {
+  vendor: string;
+  model: string;
+  ram: string;
+  interface: string;
+};
+
 export type ProviderGeoRecord = {
   owner: string;
   hostUri: string;
@@ -9,14 +16,15 @@ export type ProviderGeoRecord = {
   ipCountry: string | null;
   ipCountryCode: string | null;
   uptime30d: number | null;
-  gpuModels: string[];
+  gpuModels: GpuModelInfo[];
+  stats: { cpu: { active: number } };
 };
 
 export type FeaturedProvider = {
   owner: string;
   name: string;
   region: string;
-  gpuModels: string[];
+  gpuModels: GpuModelInfo[];
 };
 
 export type GlobeMarker = [number, number];

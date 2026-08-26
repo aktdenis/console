@@ -47,4 +47,5 @@ export class QueryKeys {
   static getProviderAttributesSchema = () => ["PROVIDER_ATTRIBUTES_SCHEMA"];
   static getBmeDashboardDataKey = () => ["BME_DASHBOARD_DATA"];
   static getBmeStatusHistoryKey = () => ["BME_STATUS_HISTORY"];
+  static getProviderDashboardKey = (owner: string) => ["PROVIDER_DASHBOARD", owner];
 }

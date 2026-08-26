@@ -23,7 +23,8 @@ function provider(overrides: Partial<ProviderGeoRecord>): ProviderGeoRecord {
     ipCountry: "United States",
     ipCountryCode: "US",
     uptime30d: 0.999,
-    gpuModels: ["h100"],
+    gpuModels: [{ vendor: "nvidia", model: "h100", ram: "80Gi", interface: "SXM5" }],
+    stats: { cpu: { active: 0 } },
     ...overrides
   };
 }

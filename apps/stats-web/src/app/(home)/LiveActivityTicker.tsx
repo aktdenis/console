@@ -41,37 +41,40 @@ function ActivityLine({ event }: { event: ActivityEvent }) {
   const friendlyType = useFriendlyMessageType(event.kind === "transaction" ? event.messageType : "");
 
   return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-x-5 gap-y-1">
-      <span className="whitespace-nowrap text-xs text-muted-foreground">
-        <FormattedRelativeTime
-          value={(new Date(event.datetime).getTime() - Date.now()) / 1000}
-          numeric="auto"
-          unit="second"
-          style="short"
-          updateIntervalInSeconds={7}
-        />
-      </span>
+    <div className="flex w-full items-center justify-between gap-x-5">
+      <div className="flex min-w-0 items-center gap-x-3">
+        <span className="whitespace-nowrap text-xs text-muted-foreground">
+          <FormattedRelativeTime
+            value={(new Date(event.datetime).getTime() - Date.now()) / 1000}
+            numeric="auto"
+            unit="second"
+            style="short"
+            updateIntervalInSeconds={7}
+          />
+        </span>
+        <span className="truncate text-sm font-semibold text-foreground">
+          {event.kind === "block" ? "New block produced" : event.isSuccess ? friendlyType || "Transaction" : "Transaction failed"}
+        </span>
+      </div>
 
-      {event.kind === "block" ? (
-        <>
-          <span className="text-sm font-semibold text-foreground">New block produced</span>
+      <div className="flex shrink-0 items-center gap-x-5">
+        {event.kind === "block" ? (
           <span className="font-mono text-sm text-muted-foreground">
             #{event.height} · {event.proposer} · {event.txCount} tx
           </span>
-        </>
-      ) : (
-        <>
-          <span className="text-sm font-semibold text-foreground">{event.isSuccess ? friendlyType || "Transaction" : "Transaction failed"}</span>
-          <span className="font-mono text-sm text-muted-foreground">
-            {getSplitText(event.hash, 6, 6)} · block #{event.height}
-          </span>
-          {event.fee > 0 && (
+        ) : (
+          <>
             <span className="font-mono text-sm text-muted-foreground">
-              <AKTAmount uakt={event.fee} showAKTLabel />
+              {getSplitText(event.hash, 6, 6)} · block #{event.height}
             </span>
-          )}
-        </>
-      )}
+            {event.fee > 0 && (
+              <span className="font-mono text-sm text-muted-foreground">
+                <AKTAmount uakt={event.fee} showAKTLabel />
+              </span>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

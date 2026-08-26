@@ -9,6 +9,7 @@ import { TopBanner } from "./TopBanner";
 
 import useCookieTheme from "@/hooks/useTheme";
 import { useTopBanner } from "@/hooks/useTopBanner";
+import { RESET_TO_OVERVIEW_EVENT } from "@/lib/dashboardTabEvents";
 
 export const Nav = () => {
   const theme = useCookieTheme();
@@ -24,7 +25,7 @@ export const Nav = () => {
 
       <div className="container flex h-14 items-center">
         {!!theme && (
-          <Link className="flex items-center space-x-2" href="/">
+          <Link className="flex items-center space-x-2" href="/" onClick={() => window.dispatchEvent(new Event(RESET_TO_OVERVIEW_EVENT))}>
             {theme === "light" ? <AkashConsoleLightLogo className="h-[21px] w-auto" /> : <AkashConsoleDarkLogo className="h-[21px] w-auto" />}
           </Link>
         )}
