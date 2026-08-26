@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { IntlProvider } from "react-intl";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { DEPENDENCIES, SpendChart, type SpendChartProps } from "@/components/charts/SpendChart/SpendChart";
 import { ACT_DENOM, AKT_DENOM, NET_AKT_BURNED_DENOM } from "@/components/charts/SpendChart/spendDenoms";
@@ -109,7 +109,11 @@ describe(SpendChart.name, () => {
   });
 
   function setup(props: SpendChartProps) {
-    const deps = MockComponents(DEPENDENCIES);
+    const deps = MockComponents(DEPENDENCIES, {
+      // The real AreaChart renders an <svg>; the chart's <defs>/<linearGradient> need that
+      // namespace to mount cleanly, so the mock provides one too instead of a bare fragment.
+      AreaChart: vi.fn(({ children }: any) => <svg>{children}</svg>) as unknown as typeof DEPENDENCIES.AreaChart
+    });
     const result = render(<SpendChart {...props} dependencies={deps} />, {
       wrapper: ({ children }) => <IntlProvider locale="en-US">{children}</IntlProvider>
     });

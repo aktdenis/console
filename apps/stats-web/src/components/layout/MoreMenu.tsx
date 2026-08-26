@@ -12,13 +12,17 @@ import {
   DropdownMenuTrigger
 } from "@akashnetwork/ui/components";
 import { ArrowUpRightSquare, Discord, Github, X as TwitterX } from "iconoir-react";
-import { MoreVertical } from "lucide-react";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+
+import { networkStore } from "@/store/network.store";
 
 export const MoreMenu = () => {
   const { setTheme, theme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [{ isLoading: isLoadingNetworks, data: networks }] = networkStore.useNetworksStore();
+  const [selectedNetworkId, setSelectedNetworkId] = networkStore.useSelectedNetworkIdStore({ reloadOnChange: true });
 
   useEffect(() => {
     setMounted(true);
@@ -33,11 +37,22 @@ export const MoreMenu = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-          <MoreVertical className="size-4" />
-          <span className="sr-only">More options</span>
+          <Menu className="size-4" />
+          <span className="sr-only">Menu</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Network</DropdownMenuLabel>
+        <DropdownMenuRadioGroup value={selectedNetworkId} onValueChange={setSelectedNetworkId}>
+          {networks.map(network => (
+            <DropdownMenuRadioItem key={network.id} disabled={!network.enabled || isLoadingNetworks} value={network.id}>
+              {network.title} <span className="text-xs text-muted-foreground">- {network.version}</span>
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem asChild>
           <Link className="flex items-center gap-2" target="_blank" rel="noreferrer" href="https://twitter.com/akashnet">
             <TwitterX className="size-4" />

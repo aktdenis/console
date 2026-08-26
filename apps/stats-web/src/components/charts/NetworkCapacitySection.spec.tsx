@@ -8,24 +8,10 @@ import { render } from "@testing-library/react";
 import { MockComponents } from "@tests/unit/mocks";
 
 describe(NetworkCapacitySection.name, () => {
-  it("forwards the globe-relevant subset of network capacity to the global grid", () => {
+  it("forwards the full network capacity to the global grid", () => {
     const { deps, networkCapacity } = setup();
 
-    expect(deps.GlobalGridContainer.mock.calls.at(0)?.at(0)).toEqual({
-      stats: {
-        activeProviderCount: networkCapacity.activeProviderCount,
-        totalCPU: networkCapacity.totalCPU,
-        totalGPU: networkCapacity.totalGPU,
-        totalMemory: networkCapacity.totalMemory,
-        totalStorage: networkCapacity.totalStorage
-      }
-    });
-  });
-
-  it("forwards the full network capacity to the utilization card", () => {
-    const { deps, networkCapacity } = setup();
-
-    expect(deps.NetworkCapacityCard.mock.calls.at(0)?.at(0)).toEqual({ networkCapacity });
+    expect(deps.GlobalGridContainer.mock.calls.at(0)?.at(0)).toEqual({ networkCapacity });
   });
 
   function setup(input?: { dependencies?: Partial<typeof DEPENDENCIES> }) {

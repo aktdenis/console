@@ -12,6 +12,10 @@ import { customColors } from "@/lib/colors";
 import { nFormatter, roundDecimal } from "@/lib/mathHelpers";
 import type { ISnapshotMetadata, SnapshotValue } from "@/types";
 
+/** akashRed (#FF414C) as an alpha-fading gradient for the area fill under the line. */
+const AREA_TOP_COLOR = "rgba(255, 65, 76, 0.4)";
+const AREA_BOTTOM_COLOR = "rgba(255, 65, 76, 0)";
+
 interface IGraphProps {
   rangedData: SnapshotValue[];
   completedSnapshots: SnapshotValue[];
@@ -37,7 +41,7 @@ const Graph: React.FunctionComponent<IGraphProps> = ({ rangedData, completedSnap
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
-  const lineSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const areaSeriesRef = useRef<ISeriesApi<"Area"> | null>(null);
 
   const [bandStyle, setBandStyle] = useState<{ left: number; width: number; height: number } | null>(null);
   const computeBandRef = useRef<() => void>(() => {});
@@ -83,10 +87,15 @@ const Graph: React.FunctionComponent<IGraphProps> = ({ rangedData, completedSnap
       height: 400
     });
 
-    const lineSeries = chart.addLineSeries({ color: customColors.akashRed, lineWidth: 2 });
+    const areaSeries = chart.addAreaSeries({
+      lineColor: customColors.akashRed,
+      lineWidth: 2,
+      topColor: AREA_TOP_COLOR,
+      bottomColor: AREA_BOTTOM_COLOR
+    });
 
     chartRef.current = chart;
-    lineSeriesRef.current = lineSeries;
+    areaSeriesRef.current = areaSeries;
 
     chart.applyOptions({
       localization: {
@@ -144,7 +153,7 @@ const Graph: React.FunctionComponent<IGraphProps> = ({ rangedData, completedSnap
       ) {
         toolTip.style.display = "none";
       } else {
-        const data: any = param.seriesData.get(lineSeries);
+        const data: any = param.seriesData.get(areaSeries);
         const isInProgressPoint = inProgressTimeRef.current != null && param.time.toString() === inProgressTimeRef.current;
         toolTip.innerHTML = `<div style='margin-bottom: 0.25rem; font-size: 0.75rem; line-height: 1rem'>
             ${format(new UTCDateMini(param.time.toString()), "MMMM d, yy")}${isInProgressPoint ? " (in progress)" : ""}
@@ -197,16 +206,16 @@ const Graph: React.FunctionComponent<IGraphProps> = ({ rangedData, completedSnap
       resizeObserver.disconnect();
       chart.timeScale().unsubscribeVisibleTimeRangeChange(handleVisibleRangeChange);
       chartRef.current = null;
-      lineSeriesRef.current = null;
+      areaSeriesRef.current = null;
       chart.remove();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedTheme, intl.locale]);
 
   useEffect(() => {
-    if (!lineSeriesRef.current || !chartRef.current) return;
+    if (!areaSeriesRef.current || !chartRef.current) return;
 
-    lineSeriesRef.current.setData(totalGraphData);
+    areaSeriesRef.current.setData(totalGraphData);
 
     if (rangedData.length > 0 && rangedData.length < totalGraphData.length) {
       const startIdx = totalGraphData.length - rangedData.length;

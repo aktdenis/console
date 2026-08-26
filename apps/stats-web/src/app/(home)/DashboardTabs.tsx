@@ -58,7 +58,7 @@ export const DashboardTabs: FC<DashboardTabsProps> = ({ dashboardData, marketDat
       ))}
     </TabsList>
 
-    <TabsContent value="overview" className="mt-5">
+    <TabsContent value="overview" className="mt-0">
       <d.Dashboard dashboardData={dashboardData} marketData={marketData} />
     </TabsContent>
 
