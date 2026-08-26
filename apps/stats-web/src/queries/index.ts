@@ -8,3 +8,4 @@ export * from "./useValidatorsQuery";
 export * from "./useBmeDashboardData";
 export * from "./useBmeStatusHistory";
 export * from "./useProviders";
+export * from "./useGpuPrices";

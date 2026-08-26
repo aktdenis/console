@@ -77,7 +77,7 @@ export const LeasesTrendChart: FC<LeasesTrendChartProps> = ({ completedSnapshots
       </d.CardHeader>
 
       <d.CardContent>
-        <d.ChartContainer config={chartConfig} className={cn("aspect-auto h-[160px] w-full", isFetching && "pointer-events-none opacity-80")}>
+        <d.ChartContainer config={chartConfig} className={cn("aspect-auto h-[240px] w-full", isFetching && "pointer-events-none opacity-80")}>
           <d.BarChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
             <d.CartesianGrid vertical={false} />
             <d.XAxis

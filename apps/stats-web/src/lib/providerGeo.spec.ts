@@ -1,10 +1,31 @@
 import { describe, expect, it } from "vitest";
 
 import type { ProviderGeoRecord } from "@/lib/providerGeo";
-import { countUniqueCountries, countUSVsElsewhere, filterOnlineProvidersWithCoords, medianUptime30d, resolveGlobeMarkers, toMarkers } from "@/lib/providerGeo";
+import {
+  countUniqueCountries,
+  countUSVsElsewhere,
+  filterOnlineProvidersWithCoords,
+  medianUptime30d,
+  resolveGlobeMarkers,
+  selectFeaturedProviders,
+  toMarkers
+} from "@/lib/providerGeo";
 
 function provider(overrides: Partial<ProviderGeoRecord>): ProviderGeoRecord {
-  return { isOnline: true, ipLat: "37.4316", ipLon: "-78.6569", ipCountryCode: "US", uptime30d: 0.999, ...overrides };
+  return {
+    owner: "akash1owner",
+    hostUri: "https://provider.example.com:8443",
+    isOnline: true,
+    isAudited: true,
+    ipLat: "37.4316",
+    ipLon: "-78.6569",
+    ipRegion: "Virginia",
+    ipCountry: "United States",
+    ipCountryCode: "US",
+    uptime30d: 0.999,
+    gpuModels: ["h100"],
+    ...overrides
+  };
 }
 
 describe(filterOnlineProvidersWithCoords.name, () => {
@@ -81,5 +102,45 @@ describe(medianUptime30d.name, () => {
   it("returns the middle value for an odd-sized set", () => {
     const providers = [provider({ uptime30d: 0.5 }), provider({ uptime30d: 0.9 }), provider({ uptime30d: 0.7 })];
     expect(medianUptime30d(providers)).toBe(0.7);
+  });
+});
+
+describe(selectFeaturedProviders.name, () => {
+  it("excludes providers that are offline, unaudited, or have no GPUs", () => {
+    const providers = [
+      provider({ owner: "offline", isOnline: false }),
+      provider({ owner: "unaudited", isAudited: false }),
+      provider({ owner: "no-gpu", gpuModels: [] }),
+      provider({ owner: "eligible" })
+    ];
+
+    const result = selectFeaturedProviders(providers, 10);
+
+    expect(result.map(p => p.owner)).toEqual(["eligible"]);
+  });
+
+  it("orders by uptime descending and caps to the requested count", () => {
+    const providers = [provider({ owner: "low", uptime30d: 0.5 }), provider({ owner: "high", uptime30d: 0.99 }), provider({ owner: "mid", uptime30d: 0.8 })];
+
+    const result = selectFeaturedProviders(providers, 2);
+
+    expect(result.map(p => p.owner)).toEqual(["high", "mid"]);
+  });
+
+  it("derives a display name from the provider's host URI and formats the region", () => {
+    const providers = [provider({ hostUri: "https://provider.ams1p0.mainnet.akashian.io:8443", ipRegion: "Amsterdam", ipCountryCode: "NL" })];
+
+    const [result] = selectFeaturedProviders(providers, 1);
+
+    expect(result.name).toBe("provider.ams1p0.mainnet.akashian.io");
+    expect(result.region).toBe("Amsterdam, NL");
+  });
+
+  it("falls back to a placeholder region when location data is missing", () => {
+    const providers = [provider({ ipRegion: null, ipCountryCode: null })];
+
+    const [result] = selectFeaturedProviders(providers, 1);
+
+    expect(result.region).toBe("Unknown region");
   });
 });

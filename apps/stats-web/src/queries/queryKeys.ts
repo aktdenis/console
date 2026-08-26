@@ -32,6 +32,7 @@ export class QueryKeys {
   static getLeaseStatusKey = (dseq: string, gseq: number, oseq: number) => ["LEASE_STATUS", dseq, gseq, oseq];
   static getBidListKey = (address: string, dseq: string) => ["BID_LIST", address, dseq];
   static getProvidersKey = () => ["PROVIDERS"];
+  static getGpuPricesKey = () => ["GPU_PRICES"];
   static getProviderListKey = () => ["PROVIDER_LIST"];
   static getProviderRegionsKey = () => ["PROVIDER_REGIONS"];
   static getProviderDetailKey = (owner: string) => ["PROVIDERS", owner];
