@@ -9,3 +9,4 @@ export * from "./useBmeDashboardData";
 export * from "./useBmeStatusHistory";
 export * from "./useProviders";
 export * from "./useGpuPrices";
+export * from "./useProviderDashboard";

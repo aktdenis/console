@@ -46,6 +46,9 @@ export class ApiUrlService {
   static gpuPrices() {
     return `${this.baseApiUrl}/v1/gpu-prices`;
   }
+  static providerDashboard(owner: string) {
+    return `${this.baseApiUrl}/v1/provider-dashboard/${owner}`;
+  }
   static bmeDashboardData() {
     return `${this.baseApiUrl}/v1/bme/dashboard-data`;
   }
