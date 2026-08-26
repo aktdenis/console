@@ -153,12 +153,18 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
                 />
               }
             />
+            <defs>
+              <linearGradient id="fillDailyUsdSpent" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--color-dailyUsdSpent)" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="var(--color-dailyUsdSpent)" stopOpacity={0.1} />
+              </linearGradient>
+            </defs>
             <d.Area
               dataKey="dailyUsdSpent"
               type="monotone"
               stroke="var(--color-dailyUsdSpent)"
-              fill="var(--color-dailyUsdSpent)"
-              fillOpacity={0.15}
+              fill="url(#fillDailyUsdSpent)"
+              fillOpacity={0.4}
               strokeWidth={2}
             />
           </d.AreaChart>
