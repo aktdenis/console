@@ -13,10 +13,11 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   }, [error]);
 
   return (
-    <PageContainer>
-      <Title>Something went wrong!</Title>
+    <PageContainer className="flex flex-col items-center justify-center gap-2 py-24 text-center">
+      <Title>This page hit a snag</Title>
+      <p className="text-muted-foreground">Refreshing usually fixes it.</p>
       <Button
-        className="my-4"
+        className="mt-4"
         onClick={
           // Attempt to recover by trying to re-render the segment
           () => reset()
