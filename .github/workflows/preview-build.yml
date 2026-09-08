@@ -1,0 +1,55 @@
+# Builds stats-web from a branch of aktdenis/console and uploads the static
+# output as a GitHub Actions artifact. Broadway downloads it and serves it.
+#
+# Triggered on demand by Broadway via workflow_dispatch.
+
+name: Build stats-web preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch ref to build, e.g. feat/stats-provider-network-tab"
+        required: true
+        type: string
+      repo:
+        description: "Fork repo, e.g. aktdenis/console"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch code
+        run: |
+          mkdir repo && cd repo
+          git init -q
+          git remote add origin https://github.com/${{ inputs.repo }}.git
+          git fetch -q --depth 1 origin "${{ inputs.ref }}"
+          git checkout -q FETCH_HEAD
+          # Slugify the branch name the same way Broadway does
+          SLUG=$(echo "${{ inputs.ref }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/^-\|-$//g' | cut -c1-50)
+          echo "PREVIEW_SLUG=branch-${SLUG}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: cd repo && npm ci
+
+      - name: Build stats-web (static export)
+        run: cd repo && NEXT_STATIC_EXPORT=1 npm run build --workspace=apps/stats-web
+        env:
+          # Suppress Sentry plugin — no auth token available in preview builds
+          SENTRY_AUTH_TOKEN: ""
+          CI: "true"
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-${{ env.PREVIEW_SLUG }}-${{ github.run_id }}
+          path: repo/apps/stats-web/out/
+          retention-days: 7
+          if-no-files-found: error
