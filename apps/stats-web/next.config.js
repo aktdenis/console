@@ -19,7 +19,7 @@ try {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  output: process.env.NEXT_STATIC_EXPORT === "1" ? "export" : "standalone",
   env: {
     NEXT_PUBLIC_APP_VERSION: version
   },
