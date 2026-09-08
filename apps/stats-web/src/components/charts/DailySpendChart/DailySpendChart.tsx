@@ -16,21 +16,12 @@ import { cn } from "@akashnetwork/ui/utils";
 import { format, parseISO } from "date-fns";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
+import { CHART_RANGE_OPTIONS, DEFAULT_CHART_RANGE_KEY } from "@/components/charts/chartRangeOptions";
 import { ChartRangeToggle } from "@/components/charts/ChartRangeToggle";
 import { ChartDownloadButton } from "@/components/charts/chartSnapshot/ChartDownloadButton";
 import { DiffPercentageChip } from "@/components/DiffPercentageChip";
 import { percIncrease, udenomToDenom } from "@/lib/mathHelpers";
 import type { SnapshotValue } from "@/types";
-
-const RANGE_OPTIONS = [
-  { key: "All", days: Number.MAX_SAFE_INTEGER, label: "All", footerPhrase: "the full history" },
-  { key: "1Y", days: 365, label: "Last Year", footerPhrase: "the last year" },
-  { key: "3M", days: 90, label: "Last 3 months", footerPhrase: "the last 3 months" },
-  { key: "30D", days: 30, label: "Last 30 days", footerPhrase: "the last 30 days" },
-  { key: "7D", days: 7, label: "Last 7 days", footerPhrase: "the last 7 days" }
-] as const;
-
-const DEFAULT_RANGE_KEY: (typeof RANGE_OPTIONS)[number]["key"] = "30D";
 
 const chartConfig = {
   dailyUsdSpent: { label: "Daily USD Spent", color: "hsl(var(--foreground))" }
@@ -67,8 +58,8 @@ export type DailySpendChartProps = {
 };
 
 export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, currentValue, compareValue, isFetching, dependencies: d = DEPENDENCIES }) => {
-  const [rangeKey, setRangeKey] = useState<string>(DEFAULT_RANGE_KEY);
-  const activeRange = RANGE_OPTIONS.find(option => option.key === rangeKey) ?? RANGE_OPTIONS[1];
+  const [rangeKey, setRangeKey] = useState<string>(DEFAULT_CHART_RANGE_KEY);
+  const activeRange = CHART_RANGE_OPTIONS.find(option => option.key === rangeKey) ?? CHART_RANGE_OPTIONS[1];
   const cardRef = useRef<HTMLDivElement>(null);
 
   const rangedData: ChartPoint[] = useMemo(() => {
@@ -106,7 +97,15 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
           {latestValue !== undefined && (
             <div className="flex items-center gap-2">
               <span className="text-lg font-semibold leading-none text-foreground">
-                <FormattedNumber value={latestValue} style="currency" currency="USD" maximumFractionDigits={0} notation="compact" compactDisplay="short" />
+                <FormattedNumber
+                  value={latestValue}
+                  style="currency"
+                  currency="USD"
+                  currencyDisplay="narrowSymbol"
+                  maximumFractionDigits={0}
+                  notation="compact"
+                  compactDisplay="short"
+                />
               </span>
               <d.DiffPercentageChip value={latestDayDelta} />
             </div>
@@ -115,7 +114,7 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
         </div>
 
         <div className="flex items-center gap-2">
-          <d.ChartRangeToggle options={RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
+          <d.ChartRangeToggle options={CHART_RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
           <d.ChartDownloadButton
             targetRef={cardRef}
             fileName="usd-spend-chart"
@@ -149,7 +148,9 @@ export const DailySpendChart: FC<DailySpendChartProps> = ({ completedSnapshots, 
                     const date = parseISO(value);
                     return isNaN(date.getTime()) ? value : format(date, "MMM d, yyyy");
                   }}
-                  formatter={value => <FormattedNumber value={Number(value)} style="currency" currency="USD" maximumFractionDigits={2} />}
+                  formatter={value => (
+                    <FormattedNumber value={Number(value)} style="currency" currency="USD" currencyDisplay="narrowSymbol" maximumFractionDigits={2} />
+                  )}
                 />
               }
             />

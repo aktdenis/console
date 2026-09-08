@@ -5,7 +5,8 @@ export const BME_LEARN_MORE_RESOURCES = [
     title: "What Burn-Mint Equilibrium Means for Akash",
     body: "How burning AKT to mint ACT gives tenants stable USD pricing while creating deflationary demand for AKT.",
     cta: "Read the post",
-    href: "https://akash.network/blog/what-burn-mint-equilibrium-means-for-akash/"
+    href: "https://akash.network/blog/what-burn-mint-equilibrium-means-for-akash/",
+    image: "/images/bme-learn-more/burn-mint-equilibrium.jpg"
   },
   {
     key: "bme-roadmap",
@@ -13,6 +14,7 @@ export const BME_LEARN_MORE_RESOURCES = [
     title: "Burn Mint Equilibrium On Akash",
     body: "The proposal behind BME: a compute credit token that burns AKT to mint and burns again on settlement. Status: Final.",
     cta: "View the proposal",
-    href: "https://akash.network/roadmap/aep-76/"
+    href: "https://akash.network/roadmap/aep-76/",
+    image: "/images/bme-learn-more/burn-mint-equilibrium.jpg"
   }
 ] as const;

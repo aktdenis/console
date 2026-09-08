@@ -2,7 +2,7 @@
 import type { FC } from "react";
 import { Spinner } from "@akashnetwork/ui/components";
 
-import { SpendChart } from "@/components/charts/SpendChart/SpendChart";
+import { SpendChart, type SpendChartViewMode } from "@/components/charts/SpendChart/SpendChart";
 import type { SpendDenom } from "@/components/charts/SpendChart/spendDenoms";
 import { useSplitSnapshots } from "@/hooks/useSplitSnapshots";
 import { useGraphSnapshot } from "@/queries";
@@ -10,9 +10,11 @@ import { useGraphSnapshot } from "@/queries";
 export type SpendChartContainerProps = {
   denom: SpendDenom;
   className?: string;
+  defaultRangeKey?: string;
+  viewMode?: SpendChartViewMode;
 };
 
-export const SpendChartContainer: FC<SpendChartContainerProps> = ({ denom, className }) => {
+export const SpendChartContainer: FC<SpendChartContainerProps> = ({ denom, className, defaultRangeKey, viewMode }) => {
   const { data: snapshotData, status, isFetching } = useGraphSnapshot(denom.snapshotKey);
   const { completed: completedSnapshots } = useSplitSnapshots(snapshotData);
 
@@ -36,6 +38,8 @@ export const SpendChartContainer: FC<SpendChartContainerProps> = ({ denom, class
       compareValue={snapshotData.compareValue}
       isFetching={isFetching}
       className={className}
+      defaultRangeKey={defaultRangeKey}
+      viewMode={viewMode}
     />
   );
 };

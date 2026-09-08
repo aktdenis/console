@@ -1,8 +1,9 @@
 "use client";
 import { Spinner } from "@akashnetwork/ui/components";
 
-import { DashboardTabs } from "./DashboardTabs";
+import { Dashboard } from "./Dashboard";
 
+import { StickyBottomNav } from "@/components/layout/StickyBottomNav";
 import { useMarketData } from "@/queries";
 import { useDashboardData } from "@/queries/useDashboardData";
 
@@ -12,14 +13,16 @@ export const DashboardContainer: React.FunctionComponent = () => {
   const isLoading = isLoadingMarketData || isLoadingDashboardData;
 
   return (
-    <div className="mt-4">
-      {dashboardData && marketData && <DashboardTabs dashboardData={dashboardData} marketData={marketData} />}
+    <div className="mt-0">
+      {dashboardData && marketData && <Dashboard dashboardData={dashboardData} marketData={marketData} />}
 
       {isLoading && !dashboardData && (
-        <div className="flex items-center justify-center p-4">
+        <div className="flex min-h-[70vh] items-center justify-center">
           <Spinner size="large" />
         </div>
       )}
+
+      <StickyBottomNav />
     </div>
   );
 };

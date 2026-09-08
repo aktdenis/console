@@ -1,16 +1,22 @@
 // @vitest-environment jsdom
 import { createRef } from "react";
 import { toCanvas } from "html-to-image";
+import autoTable from "jspdf-autotable";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
-import { ChartDownloadButton } from "@/components/charts/chartSnapshot/ChartDownloadButton";
+import { type ChartCsvData, ChartDownloadButton } from "@/components/charts/chartSnapshot/ChartDownloadButton";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 vi.mock("html-to-image", () => ({ toCanvas: vi.fn() }));
+vi.mock("jspdf-autotable", async importOriginal => {
+  const actual = await importOriginal<{ default: typeof autoTable }>();
+  return { default: vi.fn(actual.default) };
+});
 
 const mockedToCanvas = vi.mocked(toCanvas);
+const mockedAutoTable = vi.mocked(autoTable);
 
 const CSV = {
   fields: [
@@ -75,11 +81,31 @@ describe(ChartDownloadButton.name, () => {
     expect(decodeURI(downloadedHref() ?? "")).toBe('data:text/csv;charset=utf-8,"Date","Value"\n"2026-01-01",12.5');
   });
 
+  it("downloads the chart data as a pdf under the given file name plus .pdf", async () => {
+    const { downloadedFileName, downloadedHref } = setup({ fileName: "akt-spent-snapshot" });
+
+    await openMenu();
+    await userEvent.click(screen.getByRole("menuitem", { name: "Download as PDF" }));
+
+    expect(downloadedFileName()).toBe("akt-spent-snapshot.pdf");
+    expect(downloadedHref()).toMatch(/^data:application\/pdf/);
+  });
+
+  it("includes every row of the active range in the pdf table, not just what fits on screen", async () => {
+    const thirtyDaysOfRows = Array.from({ length: 30 }, (_, day) => ({ date: `2026-01-${String(day + 1).padStart(2, "0")}`, value: day }));
+    setup({ fileName: "akt-spent-snapshot" }, { csv: { fields: CSV.fields, rows: thirtyDaysOfRows } });
+
+    await openMenu();
+    await userEvent.click(screen.getByRole("menuitem", { name: "Download as PDF" }));
+
+    expect(mockedAutoTable.mock.calls[0][1].body).toHaveLength(30);
+  });
+
   function openMenu() {
     return userEvent.click(screen.getByRole("button"));
   }
 
-  function setup(props: { title?: string; subtitle?: string; fileName?: string }, options?: { withTarget?: boolean }) {
+  function setup(props: { title?: string; subtitle?: string; fileName?: string }, options?: { withTarget?: boolean; csv?: ChartCsvData }) {
     vi.spyOn(HTMLCanvasElement.prototype, "toDataURL").mockReturnValue("data:image/png;base64,fake");
     const fakeContext = mock<CanvasRenderingContext2D>({ measureText: vi.fn().mockReturnValue(mock<TextMetrics>({ width: 100 })) });
     vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(fakeContext as unknown as RenderingContext);
@@ -96,6 +122,7 @@ describe(ChartDownloadButton.name, () => {
 
     mockedToCanvas.mockClear();
     mockedToCanvas.mockResolvedValue(document.createElement("canvas"));
+    mockedAutoTable.mockClear();
     const targetRef = createRef<HTMLDivElement>();
 
     const result = render(
@@ -106,7 +133,7 @@ describe(ChartDownloadButton.name, () => {
           fileName={props.fileName ?? "chart-snapshot"}
           title={props.title ?? "Chart"}
           subtitle={props.subtitle}
-          csv={CSV}
+          csv={options?.csv ?? CSV}
         />
       </>
     );

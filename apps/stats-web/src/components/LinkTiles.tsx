@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@akashnetwork/ui/components";
-import { ArrowRight, MediaImage } from "iconoir-react";
+import { ArrowRight } from "iconoir-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export type LinkTileItem = {
@@ -10,6 +11,7 @@ export type LinkTileItem = {
   body: string;
   cta: string;
   href: string;
+  image: string;
 };
 
 export type LinkTilesProps = {
@@ -17,11 +19,11 @@ export type LinkTilesProps = {
 };
 
 export const LinkTiles: FC<LinkTilesProps> = ({ items }) => (
-  <div className="grid gap-6 sm:grid-cols-2">
+  <div className="grid gap-2 sm:grid-cols-2">
     {items.map(item => (
       <Card key={item.key} className="flex flex-col overflow-hidden">
-        <div className="flex aspect-[3/2] items-center justify-center bg-muted">
-          <MediaImage className="size-8 text-muted-foreground/50" />
+        <div className="relative aspect-[3/2] bg-muted">
+          <Image src={item.image} alt="" fill className="object-cover object-[35%_50%]" sizes="(min-width: 640px) 50vw, 100vw" />
         </div>
         <CardHeader>
           <CardDescription>{item.eyebrow}</CardDescription>

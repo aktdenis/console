@@ -14,7 +14,7 @@ export const TransactionsTable: React.FunctionComponent = () => {
       <CardContent className="px-0">
         <div>
           {isLoading ? (
-            <div className="flex items-center justify-center pt-8">
+            <div className="flex min-h-[400px] items-center justify-center">
               <Spinner size="large" />
             </div>
           ) : (

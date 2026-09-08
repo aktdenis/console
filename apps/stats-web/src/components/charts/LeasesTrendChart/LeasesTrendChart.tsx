@@ -1,4 +1,4 @@
-import { type FC, useMemo } from "react";
+import { type FC, useMemo, useState } from "react";
 import { FormattedNumber } from "react-intl";
 import type { ChartConfig } from "@akashnetwork/ui/components";
 import {
@@ -16,6 +16,8 @@ import { cn } from "@akashnetwork/ui/utils";
 import { format, parseISO } from "date-fns";
 import { Bar, BarChart, CartesianGrid, Cell, XAxis } from "recharts";
 
+import { CHART_RANGE_OPTIONS, DEFAULT_CHART_RANGE_KEY } from "@/components/charts/chartRangeOptions";
+import { ChartRangeToggle } from "@/components/charts/ChartRangeToggle";
 import { percIncrease } from "@/lib/mathHelpers";
 import type { SnapshotValue } from "@/types";
 
@@ -35,6 +37,7 @@ export const DEPENDENCIES = {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartRangeToggle,
   BarChart,
   CartesianGrid,
   XAxis,
@@ -42,10 +45,8 @@ export const DEPENDENCIES = {
   Cell
 };
 
-const WINDOW_DAYS = 30;
-
 export type LeasesTrendChartProps = {
-  /** Fully-settled days, full history - windowed to the last 30 days internally. */
+  /** Fully-settled days, full history - windowed to the selected range internally. */
   completedSnapshots: SnapshotValue[];
   /** Today's still-updating count - banded (shown, distinguished), not dropped. */
   currentValue: number;
@@ -54,13 +55,16 @@ export type LeasesTrendChartProps = {
 };
 
 export const LeasesTrendChart: FC<LeasesTrendChartProps> = ({ completedSnapshots, currentValue, isFetching, dependencies: d = DEPENDENCIES }) => {
+  const [rangeKey, setRangeKey] = useState<string>(DEFAULT_CHART_RANGE_KEY);
+  const activeRange = CHART_RANGE_OPTIONS.find(option => option.key === rangeKey) ?? CHART_RANGE_OPTIONS[1];
+
   const chartData: ChartPoint[] = useMemo(() => {
-    const windowed = completedSnapshots.slice(Math.max(completedSnapshots.length - WINDOW_DAYS, 0));
+    const windowed = completedSnapshots.slice(Math.max(completedSnapshots.length - activeRange.days, 0));
     return [
       ...windowed.map(snapshot => ({ date: snapshot.date, activeLeaseCount: snapshot.value, isInProgress: false })),
       { date: new Date().toISOString(), activeLeaseCount: currentValue, isInProgress: true }
     ];
-  }, [completedSnapshots, currentValue]);
+  }, [completedSnapshots, currentValue, activeRange.days]);
 
   const trend = useMemo(() => {
     if (chartData.length < 2) return null;
@@ -71,9 +75,13 @@ export const LeasesTrendChart: FC<LeasesTrendChartProps> = ({ completedSnapshots
 
   return (
     <d.Card>
-      <d.CardHeader className="gap-1.5 space-y-0">
-        <d.CardTitle className="text-sm">Active Leases</d.CardTitle>
-        <d.CardDescription>Open leases per day</d.CardDescription>
+      <d.CardHeader className="flex flex-col items-start gap-4 space-y-0 sm:flex-row sm:justify-between">
+        <div className="flex flex-col gap-1.5">
+          <d.CardTitle className="text-sm">Active Leases · {activeRange.label}</d.CardTitle>
+          <d.CardDescription>Open leases per day</d.CardDescription>
+        </div>
+
+        <d.ChartRangeToggle options={CHART_RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
       </d.CardHeader>
 
       <d.CardContent>
@@ -116,7 +124,7 @@ export const LeasesTrendChart: FC<LeasesTrendChartProps> = ({ completedSnapshots
         {trend && (
           <p className="text-xs font-medium text-foreground">
             {trend.percent === 0 ? "Unchanged" : trend.percent > 0 ? "Up" : "Down"}{" "}
-            <FormattedNumber value={Math.abs(trend.percent)} style="percent" maximumFractionDigits={1} /> over 30 days ·{" "}
+            <FormattedNumber value={Math.abs(trend.percent)} style="percent" maximumFractionDigits={1} /> over {activeRange.footerPhrase} ·{" "}
             <FormattedNumber value={currentValue} /> active
           </p>
         )}

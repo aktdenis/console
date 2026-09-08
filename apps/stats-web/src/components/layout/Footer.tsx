@@ -16,42 +16,16 @@ const SOCIAL_LINKS = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/akash-network/", Icon: Linkedin }
 ] as const;
 
+const FOOTER_SUBLINE =
+  "Akash is an open compute marketplace that gives builders access to a competitive global supply of infrastructure, without being locked into a single cloud provider.";
+
 const FOOTER_COLUMNS = [
-  {
-    title: "Resources",
-    links: [
-      { label: "Economics Paper", href: "https://akash.network/economics" },
-      { label: "White Paper", href: "https://akash.network/whitepaper" },
-      { label: "Blog", href: "https://akash.network/blog" },
-      { label: "Brand & Press", href: "https://akash.network/brand/resources/" }
-    ]
-  },
-  {
-    title: "Network",
-    links: [
-      { label: "About Akash", href: "https://akash.network/about/general-information/" },
-      { label: "AKT Token", href: "https://akash.network/token" },
-      { label: "Compute Providers", href: "https://akash.network/ecosystem/providers/" },
-      { label: "Akash Validators", href: "https://akash.network/network/akash-validators/" }
-    ]
-  },
-  {
-    title: "Community",
-    links: [
-      { label: "Join the Movement", href: "https://akash.network/community/welcome/" },
-      { label: "Community Contributions", href: "https://akash.network/community/contributions/" },
-      { label: "Events & Meetups", href: "https://akash.network/community/events" },
-      { label: "Student Ambassadors", href: "https://akash.network/community/student-ambassadors/" }
-    ]
-  },
   {
     title: "Development",
     links: [
       { label: "Documentation", href: "https://akash.network/docs" },
       { label: "Developer Portal", href: "https://akash.network/development/welcome/" },
-      { label: "Roadmap", href: "https://akash.network/roadmap/" },
-      { label: "Community Groups", href: "https://akash.network/development/community-groups/" },
-      { label: "Discussions", href: "https://github.com/orgs/akash-network/discussions" }
+      { label: "Roadmap", href: "https://akash.network/roadmap/" }
     ]
   },
   {
@@ -60,7 +34,22 @@ const FOOTER_COLUMNS = [
       { label: "Akash Console", href: "https://console.akash.network/" },
       { label: "AkashML", href: "https://akashml.com" },
       { label: "Akash Provider Console", href: "https://provider-console.akash.network/" },
-      { label: "Akash Chat", href: "https://chat.akash.network/" }
+      { label: "Akash Homenode", href: "http://homenode.akash.network/" }
+    ]
+  },
+  {
+    title: "Ecosystem",
+    links: [
+      { label: "Powered by Akash", href: "https://akash.network/ecosystem/deployed-on-akash/showcase/" },
+      { label: "Case Studies", href: "https://akash.network/case-studies/" }
+    ]
+  },
+  {
+    title: "About",
+    links: [
+      { label: "Compare", href: "https://akash.network/explore/compare" },
+      { label: "Use Cases", href: "https://akash.network/explore/use-cases/" },
+      { label: "Architectural Overview", href: "https://akash.network/architectural-overview/" }
     ]
   }
 ] as const;
@@ -73,31 +62,17 @@ export function Footer({ version }: { version: string }) {
 
   return (
     <footer className="w-full border-t">
-      <div className="container flex flex-col gap-10 py-10">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          {!!theme && (
+      <div className="container flex flex-col gap-10 py-10 lg:flex-row lg:flex-wrap lg:items-start lg:justify-between">
+        {!!theme && (
+          <div className="flex flex-col gap-4 lg:max-w-xs">
             <Link className="flex items-center" href="/">
               {theme === "light" ? <AkashConsoleLightLogo className="h-[21px] w-auto" /> : <AkashConsoleDarkLogo className="h-[21px] w-auto" />}
             </Link>
-          )}
-
-          <div className="flex flex-wrap items-center gap-4">
-            {SOCIAL_LINKS.map(({ label, href, Icon }) => (
-              <Link
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`Akash Network ${label}`}
-                className="text-muted-foreground transition-colors hover:text-foreground hover:no-underline"
-              >
-                <Icon className="size-5" />
-              </Link>
-            ))}
+            <p className="text-sm text-muted-foreground">{FOOTER_SUBLINE}</p>
           </div>
-        </div>
+        )}
 
-        <div className="grid grid-cols-2 gap-8 border-t pt-10 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 lg:gap-x-16">
           {FOOTER_COLUMNS.map(column => (
             <div key={column.title} className="flex flex-col gap-3">
               <span className="text-sm font-semibold text-foreground">{column.title}</span>
@@ -110,10 +85,25 @@ export function Footer({ version }: { version: string }) {
           ))}
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-2 border-t pt-6 text-xs text-muted-foreground sm:flex-row">
-          <p>© Akash Network {year}</p>
-          <span>v{version}</span>
+        <div className="flex flex-wrap items-center gap-4">
+          {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+            <Link
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Akash Network ${label}`}
+              className="text-muted-foreground transition-colors hover:text-foreground hover:no-underline"
+            >
+              <Icon className="size-5" />
+            </Link>
+          ))}
         </div>
+      </div>
+
+      <div className="container flex flex-col items-center justify-between gap-2 border-t py-6 text-xs text-muted-foreground sm:flex-row">
+        <p>© Akash Network {year}</p>
+        <span>v{version}</span>
       </div>
     </footer>
   );

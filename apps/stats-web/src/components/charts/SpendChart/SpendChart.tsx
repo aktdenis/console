@@ -10,29 +10,25 @@ import {
   CardTitle,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent
+  ChartTooltipContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@akashnetwork/ui/components";
 import { cn } from "@akashnetwork/ui/utils";
 import { format, parseISO } from "date-fns";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
+import { CHART_RANGE_OPTIONS, DEFAULT_CHART_RANGE_KEY } from "@/components/charts/chartRangeOptions";
 import { ChartRangeToggle } from "@/components/charts/ChartRangeToggle";
 import { ChartDownloadButton } from "@/components/charts/chartSnapshot/ChartDownloadButton";
 import type { SpendDenom } from "@/components/charts/SpendChart/spendDenoms";
 import { DiffPercentageChip } from "@/components/DiffPercentageChip";
 import { percIncrease } from "@/lib/mathHelpers";
 import type { SnapshotValue } from "@/types";
-
-const RANGE_OPTIONS = [
-  { key: "All", days: Number.MAX_SAFE_INTEGER, label: "All", footerPhrase: "the full history" },
-  { key: "1Y", days: 365, label: "Last Year", footerPhrase: "the last year" },
-  { key: "3M", days: 90, label: "Last 3 months", footerPhrase: "the last 3 months" },
-  { key: "30D", days: 30, label: "Last 30 days", footerPhrase: "the last 30 days" },
-  { key: "7D", days: 7, label: "Last 7 days", footerPhrase: "the last 7 days" },
-  { key: "24H", days: 2, label: "Last 24hr", footerPhrase: "the last 24 hours" }
-] as const;
-
-const DEFAULT_RANGE_KEY: (typeof RANGE_OPTIONS)[number]["key"] = "30D";
 
 type ChartPoint = { date: string; value: number };
 
@@ -54,8 +50,16 @@ export const DEPENDENCIES = {
   XAxis,
   Area,
   Bar,
-  DiffPercentageChip
+  DiffPercentageChip,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 };
+
+export type SpendChartViewMode = "chart" | "table";
 
 export type SpendChartProps = {
   denom: SpendDenom;
@@ -65,6 +69,8 @@ export type SpendChartProps = {
   compareValue: number;
   isFetching: boolean;
   className?: string;
+  defaultRangeKey?: string;
+  viewMode?: SpendChartViewMode;
   dependencies?: typeof DEPENDENCIES;
 };
 
@@ -75,10 +81,12 @@ export const SpendChart: FC<SpendChartProps> = ({
   compareValue,
   isFetching,
   className,
+  defaultRangeKey = DEFAULT_CHART_RANGE_KEY,
+  viewMode = "chart",
   dependencies: d = DEPENDENCIES
 }) => {
-  const [rangeKey, setRangeKey] = useState<string>(DEFAULT_RANGE_KEY);
-  const activeRange = RANGE_OPTIONS.find(option => option.key === rangeKey) ?? RANGE_OPTIONS[1];
+  const [rangeKey, setRangeKey] = useState<string>(defaultRangeKey);
+  const activeRange = CHART_RANGE_OPTIONS.find(option => option.key === rangeKey) ?? CHART_RANGE_OPTIONS[1];
   const cardRef = useRef<HTMLDivElement>(null);
 
   const chartConfig = useMemo(
@@ -133,7 +141,7 @@ export const SpendChart: FC<SpendChartProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <d.ChartRangeToggle options={RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
+          <d.ChartRangeToggle options={CHART_RANGE_OPTIONS} value={rangeKey} onValueChange={setRangeKey} />
           <d.ChartDownloadButton
             targetRef={cardRef}
             fileName={`${denom.key}-spend-chart`}
@@ -145,71 +153,94 @@ export const SpendChart: FC<SpendChartProps> = ({
       </d.CardHeader>
 
       <d.CardContent>
-        <d.ChartContainer config={chartConfig} className={cn("aspect-auto h-[230px] w-full", isFetching && "pointer-events-none opacity-80")}>
-          {denom.chartType === "bar" ? (
-            <d.BarChart accessibilityLayer data={rangedData} margin={{ left: 12, right: 12 }}>
-              <d.CartesianGrid vertical={false} />
-              <d.XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={10}
-                minTickGap={40}
-                tickFormatter={value => {
-                  const date = parseISO(value);
-                  return isNaN(date.getTime()) ? value : format(date, "d MMM");
-                }}
-              />
-              <d.ChartTooltip
-                content={
-                  <d.ChartTooltipContent
-                    nameKey="value"
-                    labelFormatter={value => {
-                      const date = parseISO(value);
-                      return isNaN(date.getTime()) ? value : format(date, "MMM d, yyyy");
-                    }}
-                    formatter={value => denom.formatTooltipAmount(Number(value))}
-                  />
-                }
-              />
-              <d.Bar dataKey="value" fill="var(--color-value)" radius={3} />
-            </d.BarChart>
-          ) : (
-            <d.AreaChart accessibilityLayer data={rangedData} margin={{ left: 12, right: 12 }}>
-              <d.CartesianGrid vertical={false} />
-              <d.XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={10}
-                minTickGap={40}
-                tickFormatter={value => {
-                  const date = parseISO(value);
-                  return isNaN(date.getTime()) ? value : format(date, "d MMM");
-                }}
-              />
-              <d.ChartTooltip
-                content={
-                  <d.ChartTooltipContent
-                    nameKey="value"
-                    labelFormatter={value => {
-                      const date = parseISO(value);
-                      return isNaN(date.getTime()) ? value : format(date, "MMM d, yyyy");
-                    }}
-                    formatter={value => denom.formatTooltipAmount(Number(value))}
-                  />
-                }
-              />
-              <defs>
-                <linearGradient id={`fill-${denom.key}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-value)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--color-value)" stopOpacity={0.1} />
-                </linearGradient>
-              </defs>
-              <d.Area dataKey="value" type="monotone" stroke="var(--color-value)" fill={`url(#fill-${denom.key})`} fillOpacity={0.4} strokeWidth={2} />
-            </d.AreaChart>
-          )}
-        </d.ChartContainer>
+        {viewMode === "table" ? (
+          <div
+            className={cn("h-[230px] overflow-y-auto rounded-md border print:h-auto print:overflow-visible", isFetching && "pointer-events-none opacity-80")}
+          >
+            <d.Table>
+              <d.TableHeader className="sticky top-0 bg-card print:static">
+                <d.TableRow>
+                  <d.TableHead>Date</d.TableHead>
+                  <d.TableHead className="text-right">{denom.chartLabel}</d.TableHead>
+                </d.TableRow>
+              </d.TableHeader>
+              <d.TableBody>
+                {[...rangedData].reverse().map(point => (
+                  <d.TableRow key={point.date}>
+                    <d.TableCell>{format(parseISO(point.date), "MMM d, yyyy")}</d.TableCell>
+                    <d.TableCell className="text-right tabular-nums">{denom.formatTooltipAmount(point.value)}</d.TableCell>
+                  </d.TableRow>
+                ))}
+              </d.TableBody>
+            </d.Table>
+          </div>
+        ) : (
+          <d.ChartContainer config={chartConfig} className={cn("aspect-auto h-[230px] w-full", isFetching && "pointer-events-none opacity-80")}>
+            {denom.chartType === "bar" ? (
+              <d.BarChart accessibilityLayer data={rangedData} margin={{ left: 12, right: 12 }}>
+                <d.CartesianGrid vertical={false} />
+                <d.XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={10}
+                  minTickGap={40}
+                  tickFormatter={value => {
+                    const date = parseISO(value);
+                    return isNaN(date.getTime()) ? value : format(date, "d MMM");
+                  }}
+                />
+                <d.ChartTooltip
+                  content={
+                    <d.ChartTooltipContent
+                      nameKey="value"
+                      labelFormatter={value => {
+                        const date = parseISO(value);
+                        return isNaN(date.getTime()) ? value : format(date, "MMM d, yyyy");
+                      }}
+                      formatter={value => denom.formatTooltipAmount(Number(value))}
+                    />
+                  }
+                />
+                <d.Bar dataKey="value" fill="var(--color-value)" radius={3} />
+              </d.BarChart>
+            ) : (
+              <d.AreaChart accessibilityLayer data={rangedData} margin={{ left: 12, right: 12 }}>
+                <d.CartesianGrid vertical={false} />
+                <d.XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={10}
+                  minTickGap={40}
+                  tickFormatter={value => {
+                    const date = parseISO(value);
+                    return isNaN(date.getTime()) ? value : format(date, "d MMM");
+                  }}
+                />
+                <d.ChartTooltip
+                  content={
+                    <d.ChartTooltipContent
+                      nameKey="value"
+                      labelFormatter={value => {
+                        const date = parseISO(value);
+                        return isNaN(date.getTime()) ? value : format(date, "MMM d, yyyy");
+                      }}
+                      formatter={value => denom.formatTooltipAmount(Number(value))}
+                    />
+                  }
+                />
+                <defs>
+                  <linearGradient id={`fill-${denom.key}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--color-value)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-value)" stopOpacity={0.1} />
+                  </linearGradient>
+                </defs>
+                <d.Area dataKey="value" type="monotone" stroke="var(--color-value)" fill={`url(#fill-${denom.key})`} fillOpacity={0.4} strokeWidth={2} />
+              </d.AreaChart>
+            )}
+          </d.ChartContainer>
+        )}
       </d.CardContent>
 
       <d.CardFooter className="flex-col items-start gap-1 border-t pt-4">

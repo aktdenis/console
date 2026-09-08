@@ -8,6 +8,7 @@ import {
   medianUptime30d,
   resolveGlobeMarkers,
   selectFeaturedProviders,
+  selectTopProvidersByActiveCpu,
   toMarkers
 } from "@/lib/providerGeo";
 
@@ -143,5 +144,48 @@ describe(selectFeaturedProviders.name, () => {
     const [result] = selectFeaturedProviders(providers, 1);
 
     expect(result.region).toBe("Unknown region");
+  });
+});
+
+describe(selectTopProvidersByActiveCpu.name, () => {
+  it("excludes offline providers and those with no active CPU", () => {
+    const providers = [
+      provider({ owner: "offline", isOnline: false, stats: { cpu: { active: 500_000 } } }),
+      provider({ owner: "idle", stats: { cpu: { active: 0 } } }),
+      provider({ owner: "eligible", stats: { cpu: { active: 500_000 } } })
+    ];
+
+    const result = selectTopProvidersByActiveCpu(providers, 10);
+
+    expect(result.map(p => p.owner)).toEqual(["eligible"]);
+  });
+
+  it("orders by active CPU descending and caps to the requested count", () => {
+    const providers = [
+      provider({ owner: "low", stats: { cpu: { active: 100_000 } } }),
+      provider({ owner: "high", stats: { cpu: { active: 900_000 } } }),
+      provider({ owner: "mid", stats: { cpu: { active: 400_000 } } })
+    ];
+
+    const result = selectTopProvidersByActiveCpu(providers, 2);
+
+    expect(result.map(p => p.owner)).toEqual(["high", "mid"]);
+  });
+
+  it("derives a display name and region and carries the raw active CPU value", () => {
+    const providers = [
+      provider({
+        hostUri: "https://provider.ams1p0.mainnet.akashian.io:8443",
+        ipRegion: "Amsterdam",
+        ipCountryCode: "NL",
+        stats: { cpu: { active: 842_000 } }
+      })
+    ];
+
+    const [result] = selectTopProvidersByActiveCpu(providers, 1);
+
+    expect(result.name).toBe("provider.ams1p0.mainnet.akashian.io");
+    expect(result.region).toBe("Amsterdam, NL");
+    expect(result.activeCPU).toBe(842_000);
   });
 });

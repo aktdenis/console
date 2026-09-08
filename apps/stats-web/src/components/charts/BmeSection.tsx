@@ -3,15 +3,17 @@ import type { FC } from "react";
 import { Spinner } from "@akashnetwork/ui/components";
 
 import { BmeDashboard } from "@/components/bme/BmeDashboard";
+import type { SpendChartViewMode } from "@/components/charts/SpendChart/SpendChart";
 import { useBmeDashboardData, useBmeStatusHistory } from "@/queries";
 
 export const DEPENDENCIES = { BmeDashboard, useBmeDashboardData, useBmeStatusHistory };
 
 export type BmeSectionProps = {
+  viewMode?: SpendChartViewMode;
   dependencies?: typeof DEPENDENCIES;
 };
 
-export const BmeSection: FC<BmeSectionProps> = ({ dependencies: d = DEPENDENCIES }) => {
+export const BmeSection: FC<BmeSectionProps> = ({ viewMode, dependencies: d = DEPENDENCIES }) => {
   const { data: dashboardData, isLoading: isLoadingDashboard } = d.useBmeDashboardData();
   const { data: statusHistory, isLoading: isLoadingStatusHistory } = d.useBmeStatusHistory();
 
@@ -25,5 +27,5 @@ export const BmeSection: FC<BmeSectionProps> = ({ dependencies: d = DEPENDENCIES
     ) : null;
   }
 
-  return <d.BmeDashboard dashboardData={dashboardData} statusHistory={statusHistory ?? []} />;
+  return <d.BmeDashboard dashboardData={dashboardData} statusHistory={statusHistory ?? []} viewMode={viewMode} />;
 };

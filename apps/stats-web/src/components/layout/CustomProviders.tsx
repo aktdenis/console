@@ -11,7 +11,6 @@ import { CustomIntlProvider } from "./CustomIntlProvider";
 
 import { FlagProvider } from "@/context/FlagProvider/FlagProvider";
 import { PricingProvider } from "@/context/PricingProvider";
-import { customColors } from "@/lib/colors";
 import { store } from "@/store/global.store";
 
 function Providers({ children, nonce }: React.PropsWithChildren<{ nonce?: string }>) {
@@ -25,7 +24,7 @@ function Providers({ children, nonce }: React.PropsWithChildren<{ nonce?: string
             <CustomSnackbarProvider>
               <PricingProvider>
                 <TooltipProvider>
-                  <ProgressBar height="4px" color={customColors.akashRed} options={{ showSpinner: false }} shallowRouting />
+                  <ProgressBar height="4px" color="hsl(var(--foreground))" options={{ showSpinner: false }} shallowRouting />
                   <FlagProvider>{children}</FlagProvider>
                 </TooltipProvider>
               </PricingProvider>

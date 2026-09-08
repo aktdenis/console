@@ -17,14 +17,14 @@ export const HomenodeTile: React.FunctionComponent = () => (
       </div>
       <div className="flex flex-1 flex-col justify-between gap-3 p-6">
         <div>
-          <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Consumer GPU</span>
+          <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Consumer GPUS</span>
           <h3 className="mt-2 text-xl font-bold tracking-tight text-foreground">Akash HomeNode</h3>
           <p className="mt-2 text-sm text-muted-foreground">
             For a single graphics card in a machine you already own — a 4090 or 5090 under your desk. HomeNode is the way in if what you have spare is GPU time
             rather than rack space.
           </p>
         </div>
-        <Button asChild className="w-fit hover:no-underline">
+        <Button asChild size="sm" className="w-fit hover:no-underline">
           <Link href="http://homenode.akash.network/" target="_blank" rel="noreferrer">
             Set up a HomeNode
           </Link>
