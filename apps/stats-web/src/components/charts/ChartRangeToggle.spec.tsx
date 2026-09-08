@@ -11,29 +11,37 @@ const OPTIONS = [
 ];
 
 describe(ChartRangeToggle.name, () => {
-  it("renders one item per option, showing its full label text", () => {
+  it("shows the current value's label in the dropdown trigger", () => {
     setup({ value: "30D" });
 
-    expect(screen.getByText("Last 7 Days")).toBeInTheDocument();
-    expect(screen.getByText("Last 30 Days")).toBeInTheDocument();
-    expect(screen.getByText("All Time")).toBeInTheDocument();
+    expect(screen.getByRole("combobox")).toHaveTextContent("Last 30 Days");
   });
 
-  it("reports the clicked option's key", () => {
+  it("lists every option, marking the current value's option checked", () => {
+    setup({ value: "30D" });
+
+    openDropdown();
+
+    expect(screen.getByRole("option", { name: "Last 7 Days" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Last 30 Days" })).toHaveAttribute("data-state", "checked");
+    expect(screen.getByRole("option", { name: "All Time" })).toBeInTheDocument();
+  });
+
+  it("reports the selected option's key", () => {
     const { onValueChange } = setup({ value: "30D" });
 
-    fireEvent.click(screen.getByText("All Time"));
+    openDropdown();
+    const option = screen.getByRole("option", { name: "All Time" });
+    ["pointerdown", "mousedown", "pointerup", "mouseup", "click"].forEach(type => fireEvent(option, new MouseEvent(type, { bubbles: true })));
 
     expect(onValueChange).toHaveBeenCalledWith("All");
   });
 
-  it("does not report a deselect when the already-active option is clicked again", () => {
-    const { onValueChange } = setup({ value: "30D" });
-
-    fireEvent.click(screen.getByText("Last 30 Days"));
-
-    expect(onValueChange).not.toHaveBeenCalled();
-  });
+  function openDropdown() {
+    const trigger = screen.getByRole("combobox");
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: "Enter" });
+  }
 
   function setup(input: { value: string }) {
     const onValueChange = vi.fn();

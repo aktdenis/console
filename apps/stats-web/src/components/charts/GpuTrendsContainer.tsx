@@ -27,8 +27,8 @@ export const GpuTrendsContainer: FC<GpuTrendsContainerProps> = ({ totalGPU }) =>
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <div className="flex flex-col gap-4">
+    <div className="grid gap-2 md:grid-cols-2">
+      <div className="flex flex-col gap-2">
         {gpu.data && gpuCompleted && <GpuTrendChart completedSnapshots={gpuCompleted} totalGPU={totalGPU} isFetching={gpu.isFetching} />}
         <HomenodeTile />
       </div>

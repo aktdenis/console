@@ -108,6 +108,23 @@ describe(SpendChart.name, () => {
     expect(deps.ChartContainer).toHaveBeenCalledWith(expect.objectContaining({ className: expect.stringContaining("opacity-80") }), {});
   });
 
+  it("renders a table of the ranged data instead of a chart when viewMode is table", () => {
+    const { deps, container } = setup({
+      denom: AKT_DENOM,
+      completedSnapshots: [{ date: "2026-07-01", value: 10_000_000 }],
+      currentValue: 10_000_000,
+      compareValue: 10_000_000,
+      isFetching: false,
+      viewMode: "table"
+    });
+
+    expect(deps.ChartContainer).not.toHaveBeenCalled();
+    expect(deps.AreaChart).not.toHaveBeenCalled();
+    expect(deps.BarChart).not.toHaveBeenCalled();
+    expect(deps.Table).toHaveBeenCalled();
+    expect(container.textContent).toContain("Jul 1, 2026");
+  });
+
   function setup(props: SpendChartProps) {
     const deps = MockComponents(DEPENDENCIES, {
       // The real AreaChart renders an <svg>; the chart's <defs>/<linearGradient> need that

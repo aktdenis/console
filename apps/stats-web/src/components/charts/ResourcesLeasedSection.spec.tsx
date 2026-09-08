@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { IntlProvider } from "react-intl";
 import { TooltipProvider } from "@akashnetwork/ui/components";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { mock } from "vitest-mock-extended";
 
 import { DEPENDENCIES, ResourcesLeasedSection } from "@/components/charts/ResourcesLeasedSection";
@@ -14,9 +14,67 @@ describe(ResourcesLeasedSection.name, () => {
   it("orders the tabs compute, graphics, memory, storage, with compute active by default", () => {
     setup({ now: mock<DashboardBlockStats>(), compare: mock<DashboardBlockStats>() });
 
-    const tabs = screen.getAllByRole("tab");
-    expect(tabs.map(tab => tab.getAttribute("aria-label"))).toEqual(["Compute", "Graphics", "Memory", "Storage"]);
+    const resourceTabs = screen.getAllByRole("tab").filter(tab => tab.hasAttribute("aria-label"));
+    expect(resourceTabs.map(tab => tab.getAttribute("aria-label"))).toEqual(["Compute", "Graphics", "Memory", "Storage"]);
     expect(screen.getByRole("tab", { name: "Compute" })).toHaveAttribute("data-state", "active");
+  });
+
+  it("shows the classic per-resource tabs by default and switches to the bubble chart view", () => {
+    const { deps } = setup({ now: mock<DashboardBlockStats>(), compare: mock<DashboardBlockStats>() });
+
+    expect(screen.getByRole("tab", { name: "Compute" })).toBeInTheDocument();
+    expect(deps.ResourcesLeasedBubbleChartContainer).not.toHaveBeenCalled();
+
+    selectView("Bubble");
+
+    expect(screen.queryByRole("tab", { name: "Compute" })).not.toBeInTheDocument();
+    expect(deps.ResourcesLeasedBubbleChartContainer).toHaveBeenCalled();
+  });
+
+  it("shows a checkmark next to the active view in the view dropdown", () => {
+    setup({ now: mock<DashboardBlockStats>(), compare: mock<DashboardBlockStats>() });
+
+    const trigger = screen.getByRole("button", { name: "Classic" });
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: "Enter" });
+
+    expect(screen.getByRole("menuitem", { name: /^Classic/ })).toHaveTextContent("Classic");
+    expect(screen.getByRole("menuitem", { name: /^Bubble/ })).toBeInTheDocument();
+  });
+
+  it("shows the become-a-provider CTA below the resources card", () => {
+    const { deps } = setup({ now: mock<DashboardBlockStats>(), compare: mock<DashboardBlockStats>() });
+
+    expect(deps.NetworkProviderCta).toHaveBeenCalled();
+  });
+
+  it("shows the GPU price list above the become-a-provider CTA", () => {
+    const { deps } = setup({ now: mock<DashboardBlockStats>(), compare: mock<DashboardBlockStats>() });
+
+    expect(deps.GpuPriceListContainer).toHaveBeenCalled();
+    const gpuPriceListCallOrder = vi.mocked(deps.GpuPriceListContainer).mock.invocationCallOrder[0];
+    const ctaCallOrder = vi.mocked(deps.NetworkProviderCta).mock.invocationCallOrder[0];
+    expect(gpuPriceListCallOrder).toBeLessThan(ctaCallOrder);
+  });
+
+  it("hides the week/month granularity toggle in classic view and shows it in bubble view, defaulting to week", () => {
+    const { deps } = setup({ now: mock<DashboardBlockStats>(), compare: mock<DashboardBlockStats>() });
+
+    expect(screen.queryByText("Week")).not.toBeInTheDocument();
+
+    selectView("Bubble");
+
+    expect(screen.getByRole("combobox")).toHaveTextContent("Week");
+    expect(deps.ResourcesLeasedBubbleChartContainer.mock.calls.at(-1)?.at(0)).toEqual({ granularityKey: "week" });
+  });
+
+  it("passes the selected granularity through to the bubble chart container", () => {
+    const { deps } = setup({ now: mock<DashboardBlockStats>(), compare: mock<DashboardBlockStats>() });
+
+    selectView("Bubble");
+    selectGranularity("Month");
+
+    expect(deps.ResourcesLeasedBubbleChartContainer.mock.calls.at(-1)?.at(0)).toEqual({ granularityKey: "month" });
   });
 
   it("shows compute's leased CPU by default, converted from millicores to cores, not the other resources'", () => {
@@ -61,6 +119,21 @@ describe(ResourcesLeasedSection.name, () => {
       expect(call.at(0)).toMatchObject({ className: "rounded-t-none border-t-0" });
     }
   });
+
+  function selectView(label: "Classic" | "Bubble") {
+    const trigger = screen.getByRole("button", { name: "Classic" });
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    fireEvent.click(screen.getByRole("menuitem", { name: new RegExp(`^${label}`) }));
+  }
+
+  function selectGranularity(label: "Week" | "Month") {
+    const trigger = screen.getByRole("combobox");
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: "Enter" });
+    const option = screen.getByRole("option", { name: label });
+    ["pointerdown", "mousedown", "pointerup", "mouseup", "click"].forEach(type => fireEvent(option, new MouseEvent(type, { bubbles: true })));
+  }
 
   function setup(props: { now: DashboardBlockStats; compare: DashboardBlockStats }) {
     const deps = MockComponents(DEPENDENCIES);

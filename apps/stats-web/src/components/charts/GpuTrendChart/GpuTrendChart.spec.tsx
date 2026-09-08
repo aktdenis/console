@@ -2,6 +2,7 @@
 import { IntlProvider } from "react-intl";
 import { describe, expect, it } from "vitest";
 
+import { CHART_RANGE_OPTIONS } from "@/components/charts/chartRangeOptions";
 import { DEPENDENCIES, GpuTrendChart, type GpuTrendChartProps } from "@/components/charts/GpuTrendChart/GpuTrendChart";
 import type { SnapshotValue } from "@/types";
 import { render } from "@testing-library/react";
@@ -40,6 +41,12 @@ describe(GpuTrendChart.name, () => {
     const { deps } = setup({ completedSnapshots: daysOfSnapshots(2), totalGPU: 422, isFetching: false });
 
     expect(deps.CardDescription).toHaveBeenCalled();
+  });
+
+  it("offers the full set of range options, defaulting to 30 days", () => {
+    const { deps } = setup({ completedSnapshots: daysOfSnapshots(2), totalGPU: 422, isFetching: false });
+
+    expect(deps.ChartRangeToggle.mock.calls.at(0)?.at(0)).toEqual(expect.objectContaining({ options: CHART_RANGE_OPTIONS, value: "30D" }));
   });
 
   function setup(props: GpuTrendChartProps) {

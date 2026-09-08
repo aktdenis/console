@@ -81,3 +81,19 @@ export function selectFeaturedProviders(providers: ProviderGeoRecord[], count: n
     .slice(0, count)
     .map(p => ({ owner: p.owner, name: providerDisplayName(p.hostUri), region: providerRegionLabel(p), gpuModels: p.gpuModels }));
 }
+
+export type TopProviderByCpu = {
+  owner: string;
+  name: string;
+  region: string;
+  activeCPU: number;
+};
+
+/** Ranked by each provider's own active CPU (millicores) - the only per-provider active-resource stat the API exposes today. */
+export function selectTopProvidersByActiveCpu(providers: ProviderGeoRecord[], count: number): TopProviderByCpu[] {
+  return providers
+    .filter(p => p.isOnline && p.stats.cpu.active > 0)
+    .sort((a, b) => b.stats.cpu.active - a.stats.cpu.active)
+    .slice(0, count)
+    .map(p => ({ owner: p.owner, name: providerDisplayName(p.hostUri), region: providerRegionLabel(p), activeCPU: p.stats.cpu.active }));
+}

@@ -1,21 +1,9 @@
 "use client";
 import { type FC, type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedNumber } from "react-intl";
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  Spinner,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger
-} from "@akashnetwork/ui/components";
-import { ArrowRight } from "lucide-react";
+import { Button, Spinner, Tooltip, TooltipContent, TooltipTrigger } from "@akashnetwork/ui/components";
 
+import { BecomeProviderDialog } from "@/components/BecomeProviderDialog";
 import { formatGpuModelName } from "@/components/charts/GpuPriceList/gpuModelLabels";
 import type { ConstellationNode } from "@/lib/ecosystemConstellation";
 import { bytesToShrink } from "@/lib/unitUtils";
@@ -409,7 +397,7 @@ export const EcosystemConstellation: FC<EcosystemConstellationProps> = ({ nodes 
   }, [stickyNode, containerSize]);
 
   return (
-    <div ref={containerRef} className="dark relative h-[calc(100vh-180px)] min-h-[480px] w-full cursor-none rounded-xl border bg-card">
+    <div ref={containerRef} className="dark relative aspect-video w-full cursor-none rounded-xl border bg-card">
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl" aria-hidden="true">
         {containerSize &&
           visibleNodes.map(node => {
@@ -484,35 +472,13 @@ export const EcosystemConstellation: FC<EcosystemConstellationProps> = ({ nodes 
       </div>
 
       <div className="absolute bottom-4 right-4">
-        <Dialog>
-          <DialogTrigger asChild>
+        <BecomeProviderDialog
+          trigger={
             <Button variant="default" size="sm" className="cursor-pointer font-mono hover:no-underline">
               Become a Provider
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Two ways to provide</DialogTitle>
-              <DialogDescription>Both put capacity onto the same Akash marketplace. Pick the one that matches the hardware you have.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <ProviderOptionCard
-                eyebrow="Consumer GPU"
-                title="Akash HomeNode"
-                body="For a single graphics card in a machine you already own. HomeNode is the way in if what you have spare is GPU time rather than rack space."
-                cta="Set up a HomeNode"
-                href="http://homenode.akash.network/"
-              />
-              <ProviderOptionCard
-                eyebrow="Data center capacity"
-                title="Provider Console"
-                body="For whole machines - CPU, memory, storage and GPUs offered together. Stand that capacity up as an Akash provider and start accepting workloads."
-                cta="Open Provider Console"
-                href="https://provider-console.akash.network/"
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
+          }
+        />
       </div>
 
       {activeNode && <ActiveProviderPanel node={activeNode} />}
@@ -776,21 +742,4 @@ const Stat: FC<{ label: string; value: React.ReactNode }> = ({ label, value }) =
     <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
     <p className="font-semibold tabular-nums text-foreground">{value}</p>
   </div>
-);
-
-const ProviderOptionCard: FC<{ eyebrow: string; title: string; body: string; cta: string; href: string }> = ({ eyebrow, title, body, cta, href }) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noreferrer"
-    className="group flex flex-col rounded-lg border p-4 transition-colors hover:border-foreground/30 hover:bg-accent hover:no-underline"
-  >
-    <p className="text-xs uppercase tracking-wide text-muted-foreground">{eyebrow}</p>
-    <p className="mt-1 text-base font-semibold text-foreground">{title}</p>
-    <p className="mt-2 flex-1 text-sm text-muted-foreground">{body}</p>
-    <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-foreground">
-      {cta}
-      <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-    </span>
-  </a>
 );

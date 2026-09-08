@@ -13,7 +13,7 @@ export const EcosystemConstellationContainer: FC = () => {
 
   if (status === "pending") {
     return (
-      <div className="flex h-[calc(100vh-180px)] min-h-[480px] items-center justify-center rounded-xl border">
+      <div className="flex aspect-video items-center justify-center rounded-xl border">
         <Spinner size="large" />
       </div>
     );

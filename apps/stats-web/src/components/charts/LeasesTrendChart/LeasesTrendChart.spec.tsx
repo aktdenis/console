@@ -2,6 +2,7 @@
 import { IntlProvider } from "react-intl";
 import { describe, expect, it } from "vitest";
 
+import { CHART_RANGE_OPTIONS } from "@/components/charts/chartRangeOptions";
 import { DEPENDENCIES, LeasesTrendChart, type LeasesTrendChartProps } from "@/components/charts/LeasesTrendChart/LeasesTrendChart";
 import type { SnapshotValue } from "@/types";
 import { render } from "@testing-library/react";
@@ -40,6 +41,12 @@ describe(LeasesTrendChart.name, () => {
     const { deps } = setup({ completedSnapshots: [{ date: "2026-07-01", value: 100 }], currentValue: 150, isFetching: false });
 
     expect(deps.CardFooter).toHaveBeenCalled();
+  });
+
+  it("offers the full set of range options, defaulting to 30 days", () => {
+    const { deps } = setup({ completedSnapshots: daysOfSnapshots(3), currentValue: 800, isFetching: false });
+
+    expect(deps.ChartRangeToggle.mock.calls.at(0)?.at(0)).toEqual(expect.objectContaining({ options: CHART_RANGE_OPTIONS, value: "30D" }));
   });
 
   function setup(props: LeasesTrendChartProps) {

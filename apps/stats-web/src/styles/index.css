@@ -1,3 +1,58 @@
 .light {
   --background: 0 0% 98%;
 }
+
+@media print {
+  html,
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+}
+
+@keyframes capacity-bubble-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-capacity-bubble-float {
+  animation: capacity-bubble-float 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-capacity-bubble-float {
+    animation: none;
+  }
+}
+
+@keyframes dot-drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-dot-drop-in {
+  animation: dot-drop-in 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-dot-drop-in {
+    animation: none;
+  }
+}

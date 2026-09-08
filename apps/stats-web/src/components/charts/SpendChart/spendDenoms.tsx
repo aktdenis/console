@@ -82,9 +82,13 @@ export const USD_DENOM: SpendDenom = {
     "This is the total amount spent (ACT + AKT converted to USD) to rent computing power on the akash network since the beginning of the network. (March 2021)",
   toDisplayValue: udenomToDenom,
   chartType: "area",
-  formatTotal: value => <FormattedNumber value={value} style="currency" currency="USD" notation="compact" maximumFractionDigits={2} />,
-  formatAmount: value => <FormattedNumber value={value} style="currency" currency="USD" notation="compact" maximumFractionDigits={2} />,
-  formatTooltipAmount: value => <FormattedNumber value={value} style="currency" currency="USD" maximumFractionDigits={2} />
+  formatTotal: value => (
+    <FormattedNumber value={value} style="currency" currency="USD" currencyDisplay="narrowSymbol" notation="compact" maximumFractionDigits={2} />
+  ),
+  formatAmount: value => (
+    <FormattedNumber value={value} style="currency" currency="USD" currencyDisplay="narrowSymbol" notation="compact" maximumFractionDigits={2} />
+  ),
+  formatTooltipAmount: value => <FormattedNumber value={value} style="currency" currency="USD" currencyDisplay="narrowSymbol" maximumFractionDigits={2} />
 };
 
 export const LEASE_COUNT_DENOM: SpendDenom = {

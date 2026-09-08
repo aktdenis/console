@@ -1,5 +1,6 @@
 import type { FC } from "react";
 
+import type { SpendChartViewMode } from "@/components/charts/SpendChart/SpendChart";
 import { SpendChartContainer } from "@/components/charts/SpendChart/SpendChartContainer";
 import { ACT_DENOM, AKT_DENOM } from "@/components/charts/SpendChart/spendDenoms";
 import { DiffPercentageChip } from "@/components/DiffPercentageChip";
@@ -12,10 +13,11 @@ export const DEPENDENCIES = { SpendChartContainer };
 export type AssetsSpentAktSectionProps = {
   now: DashboardBlockStats;
   compare: DashboardBlockStats;
+  viewMode?: SpendChartViewMode;
   dependencies?: typeof DEPENDENCIES;
 };
 
-export const AssetsSpentAktSection: FC<AssetsSpentAktSectionProps> = ({ now, compare, dependencies: d = DEPENDENCIES }) => (
+export const AssetsSpentAktSection: FC<AssetsSpentAktSectionProps> = ({ now, compare, viewMode, dependencies: d = DEPENDENCIES }) => (
   <StatCardTabs
     defaultValue={AKT_DENOM.key}
     items={[
@@ -29,7 +31,7 @@ export const AssetsSpentAktSection: FC<AssetsSpentAktSectionProps> = ({ now, com
             <DiffPercentageChip value={percIncrease(compare.totalUActSpent, now.totalUActSpent)} />
           </>
         ),
-        panel: <d.SpendChartContainer denom={ACT_DENOM} className="rounded-t-none border-t-0" />
+        panel: <d.SpendChartContainer denom={ACT_DENOM} className="rounded-t-none border-t-0" viewMode={viewMode} />
       },
       {
         value: AKT_DENOM.key,
@@ -41,7 +43,7 @@ export const AssetsSpentAktSection: FC<AssetsSpentAktSectionProps> = ({ now, com
             <DiffPercentageChip value={percIncrease(compare.totalUAktSpent, now.totalUAktSpent)} />
           </>
         ),
-        panel: <d.SpendChartContainer denom={AKT_DENOM} className="rounded-t-none border-t-0" />
+        panel: <d.SpendChartContainer denom={AKT_DENOM} className="rounded-t-none border-t-0" viewMode={viewMode} />
       }
     ]}
   />

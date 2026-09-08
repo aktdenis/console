@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { ToggleGroup, ToggleGroupItem } from "@akashnetwork/ui/components";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@akashnetwork/ui/components";
 
 export type ChartRangeOption = {
   key: string;
@@ -14,25 +14,16 @@ export type ChartRangeToggleProps = {
 };
 
 export const ChartRangeToggle: FC<ChartRangeToggleProps> = ({ options, value, onValueChange }) => (
-  <ToggleGroup
-    type="single"
-    variant="outline"
-    size="sm"
-    value={value}
-    onValueChange={next => {
-      if (next) onValueChange(next);
-    }}
-    className="flex-wrap justify-start gap-0"
-  >
-    {options.map(option => (
-      <ToggleGroupItem
-        key={option.key}
-        value={option.key}
-        aria-label={option.label}
-        className="rounded-none first:rounded-l-md last:rounded-r-md [&:not(:first-child)]:-ml-px"
-      >
-        {option.label}
-      </ToggleGroupItem>
-    ))}
-  </ToggleGroup>
+  <Select value={value} onValueChange={onValueChange}>
+    <SelectTrigger className="h-8 w-[140px] text-xs" aria-label="Select a range">
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent>
+      {options.map(option => (
+        <SelectItem key={option.key} value={option.key}>
+          {option.label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
 );

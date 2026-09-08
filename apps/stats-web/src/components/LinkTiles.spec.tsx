@@ -5,8 +5,24 @@ import { LinkTiles } from "@/components/LinkTiles";
 import { render, screen } from "@testing-library/react";
 
 const ITEMS = [
-  { key: "blog", eyebrow: "Blog", title: "What BME Means for Akash", body: "An explainer.", cta: "Read the post", href: "https://example.com/blog" },
-  { key: "roadmap", eyebrow: "Roadmap", title: "AEP-76", body: "The proposal.", cta: "View the proposal", href: "https://example.com/roadmap" }
+  {
+    key: "blog",
+    eyebrow: "Blog",
+    title: "What BME Means for Akash",
+    body: "An explainer.",
+    cta: "Read the post",
+    href: "https://example.com/blog",
+    image: "/images/blog.jpg"
+  },
+  {
+    key: "roadmap",
+    eyebrow: "Roadmap",
+    title: "AEP-76",
+    body: "The proposal.",
+    cta: "View the proposal",
+    href: "https://example.com/roadmap",
+    image: "/images/roadmap.jpg"
+  }
 ];
 
 describe(LinkTiles.name, () => {

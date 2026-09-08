@@ -3,6 +3,7 @@ import { FormattedDate, FormattedTime } from "react-intl";
 import { Spinner } from "@akashnetwork/ui/components";
 
 import { BmeDashboard } from "@/components/bme/BmeDashboard";
+import { StickyBottomNav } from "@/components/layout/StickyBottomNav";
 import { Title } from "@/components/Title";
 import { useBmeDashboardData, useBmeStatusHistory } from "@/queries";
 
@@ -31,10 +32,12 @@ export const BmeDashboardContainer: React.FunctionComponent = () => {
       )}
 
       {isLoading && !hasData && (
-        <div className="flex items-center justify-center p-4">
+        <div className="flex min-h-[70vh] items-center justify-center">
           <Spinner size="large" />
         </div>
       )}
+
+      <StickyBottomNav />
     </div>
   );
 };

@@ -1,56 +1,27 @@
 "use client";
 import type { FC } from "react";
-import { FormattedNumber } from "react-intl";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, Progress } from "@akashnetwork/ui/components";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@akashnetwork/ui/components";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { NetworkGlobeCanvas } from "@/components/charts/GlobalGrid/NetworkGlobeCanvas";
-import type { UtilizationRow } from "@/components/charts/UtilizationCard";
+import { type TopProviderRow, TopProvidersCard } from "@/components/charts/GlobalGrid/TopProvidersCard";
 import type { FeaturedProvider, GlobeMarker } from "@/lib/providerGeo";
 
-export const DEPENDENCIES = { Card, CardContent, CardDescription, CardHeader, CardTitle, NetworkGlobeCanvas, Progress };
+export const DEPENDENCIES = { Card, CardContent, CardDescription, CardHeader, CardTitle, NetworkGlobeCanvas, TopProvidersCard };
 
 export type GlobalGridCardProps = {
-  utilizationRows: UtilizationRow[];
   markers: GlobeMarker[];
   providerCountLabel: string;
   featuredProviders: FeaturedProvider[];
+  topProviders: TopProviderRow[];
   dependencies?: typeof DEPENDENCIES;
 };
 
-export const GlobalGridCard: FC<GlobalGridCardProps> = ({
-  utilizationRows,
-  markers,
-  providerCountLabel,
-  featuredProviders,
-  dependencies: d = DEPENDENCIES
-}) => {
+export const GlobalGridCard: FC<GlobalGridCardProps> = ({ markers, providerCountLabel, featuredProviders, topProviders, dependencies: d = DEPENDENCIES }) => {
   return (
-    <div className="flex flex-col gap-4">
-      <d.Card>
-        <d.CardHeader className="gap-1.5 space-y-0">
-          <d.CardTitle className="text-base">Leased versus total capacity</d.CardTitle>
-        </d.CardHeader>
-
-        <d.CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {utilizationRows.map(row => (
-            <div key={row.key} className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">{row.label}</span>
-              <div className="flex items-baseline gap-1.5 whitespace-nowrap">
-                <span className="text-2xl font-semibold tracking-tight text-foreground">{row.activeLabel}</span>
-                <span className="text-sm text-muted-foreground">{row.totalLabel}</span>
-              </div>
-              <d.Progress value={row.percent * 100} className="h-1.5" />
-              <span className="text-sm font-semibold text-foreground">
-                <FormattedNumber value={row.percent} style="percent" maximumFractionDigits={1} />
-              </span>
-            </div>
-          ))}
-        </d.CardContent>
-      </d.Card>
-
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+    <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-1 gap-2 lg:grid-cols-4">
         <d.Card className="lg:col-span-3">
           <d.CardHeader className="gap-1.5 space-y-0">
             <d.CardTitle className="text-base">Global Grid</d.CardTitle>
@@ -90,6 +61,8 @@ export const GlobalGridCard: FC<GlobalGridCardProps> = ({
           </Link>
         </d.Card>
       </div>
+
+      {topProviders.length > 0 && <d.TopProvidersCard rows={topProviders} />}
     </div>
   );
 };

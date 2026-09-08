@@ -18,13 +18,13 @@ export const BecomeProviderTile: React.FunctionComponent = () => (
       <div className="flex flex-1 flex-col justify-between gap-3 p-6">
         <div>
           <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Data center capacity</span>
-          <h3 className="mt-2 text-xl font-bold tracking-tight text-foreground">Become a provider</h3>
+          <h3 className="mt-2 text-xl font-bold tracking-tight text-foreground">Become a Compute Provider</h3>
           <p className="mt-2 text-sm text-muted-foreground">
             For whole machines — CPU, memory, storage and GPUs offered together. Provider Console is where you stand that capacity up as an Akash provider and
             start accepting workloads.
           </p>
         </div>
-        <Button asChild className="w-fit hover:no-underline">
+        <Button asChild size="sm" className="w-fit hover:no-underline">
           <Link href="https://provider-console.akash.network/" target="_blank" rel="noreferrer">
             Open Provider Console
           </Link>

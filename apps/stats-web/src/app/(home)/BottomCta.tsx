@@ -22,13 +22,11 @@ export const BottomCta: React.FunctionComponent = () => (
     />
 
     <div className="relative flex flex-col items-center gap-4 px-6 pt-16 text-center">
-      <div className="flex flex-col items-center gap-4 rounded-lg bg-card/95 p-4">
-        <h2 className="max-w-2xl text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Deploy on Akash.</h2>
-        <p className="max-w-xl text-muted-foreground">
-          Rent compute from the same open marketplace this dashboard tracks — GPUs, CPUs, and storage, priced by the network, not a sales team.
-        </p>
-      </div>
-      <Button asChild size="lg" className="hover:no-underline">
+      <h2 className="max-w-2xl text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Deploy on Akash.</h2>
+      <p className="max-w-xl text-muted-foreground">
+        Rent compute from the same open marketplace this dashboard tracks — GPUs, CPUs, and storage, priced by the network, not a sales team.
+      </p>
+      <Button asChild className="hover:no-underline">
         <Link href="https://console.akash.network" target="_blank" rel="noreferrer">
           Deploy Now
         </Link>
