@@ -39,12 +39,12 @@ jobs:
       - name: Install dependencies
         run: cd repo && npm ci
 
-      - name: Patch next.config.js for static export
+      - name: Patch for static export
         run: |
           CONFIG=repo/apps/stats-web/next.config.js
-          # Replace hardcoded "standalone" with env-gated export so NEXT_STATIC_EXPORT=1 works
-          # even on branches that predate this change.
           sed -i 's/output: "standalone"/output: process.env.NEXT_STATIC_EXPORT === "1" ? "export" : "standalone"/' "$CONFIG"
+          # API routes can't be statically exported — remove them so the build doesn't fail.
+          rm -rf repo/apps/stats-web/src/app/api
 
       - name: Build stats-web (static export)
         run: cd repo && NEXT_STATIC_EXPORT=1 npm run build --workspace=apps/stats-web
