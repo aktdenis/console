@@ -52,6 +52,12 @@ jobs:
           rm -f "$APP/apple-icon.ts" "$APP/apple-icon.tsx" "$APP/apple-icon.js" "$APP/apple-icon.jsx"
           rm -f "$APP/opengraph-image.ts" "$APP/opengraph-image.tsx" "$APP/opengraph-image.js" "$APP/opengraph-image.jsx"
           rm -f "$APP/twitter-image.ts" "$APP/twitter-image.tsx" "$APP/twitter-image.js" "$APP/twitter-image.jsx"
+          # Force-static the root layout so cookies()/headers() return empty values
+          # instead of throwing — acceptable for a read-only preview build.
+          LAYOUT="$APP/layout.tsx"
+          if [ -f "$LAYOUT" ]; then
+            sed -i '1s/^/export const dynamic = "force-static";\n/' "$LAYOUT"
+          fi
           echo "Remaining files in $APP:"
           find "$APP" -type f | sort
 
