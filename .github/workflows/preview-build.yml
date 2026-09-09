@@ -58,6 +58,141 @@ jobs:
           if [ -f "$LAYOUT" ]; then
             sed -i '1s/^/export const dynamic = "force-static";\n/' "$LAYOUT"
           fi
+          echo "Running Python patch script..."
+          python3 << 'PYEOF'
+          import os, re
+
+          APP = 'repo/apps/stats-web/src/app'
+
+          # Dynamic route pages and their static preview params
+          # For doubly-nested routes, all dynamic segment params must be included
+          DYNAMIC_PAGES = {
+            f'{APP}/addresses/[address]/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ address: '_preview_' }]; }\n",
+            f'{APP}/addresses/[address]/deployments/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ address: '_preview_' }]; }\n",
+            f'{APP}/addresses/[address]/deployments/[dseq]/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ address: '_preview_', dseq: '_preview_' }]; }\n",
+            f'{APP}/addresses/[address]/transactions/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ address: '_preview_' }]; }\n",
+            f'{APP}/blocks/[height]/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ height: '_preview_' }]; }\n",
+            f'{APP}/bme-graph/[snapshot]/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ snapshot: '_preview_' }]; }\n",
+            f'{APP}/graph/[snapshot]/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ snapshot: '_preview_' }]; }\n",
+            f'{APP}/provider-graph/[snapshot]/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ snapshot: '_preview_' }]; }\n",
+            f'{APP}/transactions/[hash]/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ hash: '_preview_' }]; }\n",
+            f'{APP}/validators/[address]/page.tsx':
+              "export const dynamicParams = false;\nexport function generateStaticParams() { return [{ address: '_preview_' }]; }\n",
+          }
+
+          for path, prefix in DYNAMIC_PAGES.items():
+            if not os.path.exists(path):
+              print(f'SKIP (not found): {path}')
+              continue
+            with open(path) as f:
+              content = f.read()
+            if 'generateStaticParams' in content:
+              print(f'ALREADY PATCHED: {path}')
+              continue
+            with open(path, 'w') as f:
+              f.write(prefix + content)
+            print(f'PATCHED (GSP): {path}')
+
+          # Pages that parse searchParams.network with Zod — add .default('mainnet')
+          # so prerendering with empty searchParams doesn't throw
+          NETWORK_PAGES = [
+            f'{APP}/addresses/[address]/page.tsx',
+            f'{APP}/addresses/[address]/deployments/[dseq]/page.tsx',
+            f'{APP}/blocks/[height]/page.tsx',
+            f'{APP}/transactions/[hash]/page.tsx',
+            f'{APP}/validators/[address]/page.tsx',
+          ]
+
+          for path in NETWORK_PAGES:
+            if not os.path.exists(path):
+              continue
+            with open(path) as f:
+              content = f.read()
+            # Only patch if not already defaulted
+            if 'networkId.default' not in content:
+              new_content = content.replace('network: networkId', "network: networkId.default('mainnet')")
+              if new_content != content:
+                with open(path, 'w') as f:
+                  f.write(new_content)
+                print(f'PATCHED (network default): {path}')
+
+          # Pages that throw on non-404 API errors — make them return null instead
+          # so prerendering with placeholder params produces a graceful "not found" page
+          FETCH_PAGES = [
+            f'{APP}/addresses/[address]/page.tsx',
+            f'{APP}/addresses/[address]/deployments/[dseq]/page.tsx',
+            f'{APP}/blocks/[height]/page.tsx',
+            f'{APP}/transactions/[hash]/page.tsx',
+          ]
+
+          # Pattern: `!response.ok && response.status !== 404` with throw → return null
+          THROW_PATTERN = re.compile(
+            r'if \(!response\.ok && response\.status !== 404\) \{[^}]*\n\s*throw new Error\([^)]*\);\s*\n\s*\} else if \(response\.status === 404\) \{\s*\n(\s*)(?:logger\.[a-z]+\([^)]*\);\s*\n\s*)?return null;\s*\n\s*\}',
+            re.MULTILINE
+          )
+
+          for path in FETCH_PAGES:
+            if not os.path.exists(path):
+              continue
+            with open(path) as f:
+              content = f.read()
+            if '!response.ok && response.status !== 404' not in content:
+              continue
+            new_content = re.sub(
+              r'if \(!response\.ok && response\.status !== 404\) \{[^}]*throw new Error\([^)]*\);\s*\} else if \(response\.status === 404\) \{[^}]*return null;\s*\}',
+              'if (!response.ok) { return null; }',
+              content,
+              flags=re.DOTALL
+            )
+            if new_content != content:
+              with open(path, 'w') as f:
+                f.write(new_content)
+              print(f'PATCHED (no-throw): {path}')
+
+          # Validators page: throw without 404 check — convert to return null
+          validators_path = f'{APP}/validators/[address]/page.tsx'
+          if os.path.exists(validators_path):
+            with open(validators_path) as f:
+              content = f.read()
+            # Fix fetchValidatorData return type and error handling
+            new_content = content.replace(
+              'Promise<ValidatorDetail>',
+              'Promise<ValidatorDetail | null>'
+            )
+            # Fix the throw-only error handler
+            new_content = re.sub(
+              r'if \(!response\.ok\) \{\s*(?://[^\n]*)?\s*throw new Error\([^)]*\);\s*\}',
+              'if (!response.ok) { return null; }',
+              new_content,
+              flags=re.DOTALL
+            )
+            # Fix generateMetadata to handle failed response
+            new_content = new_content.replace(
+              '  const data = (await response.json()) as ValidatorDetail;\n\n  return {',
+              '  if (!response.ok) { return { title: \'Validator Details\', alternates: { canonical: url }, openGraph: { url } }; }\n  const data = (await response.json()) as ValidatorDetail;\n\n  return {'
+            )
+            # Fix page component to handle null validator
+            if 'if (!validator)' not in new_content:
+              new_content = new_content.replace(
+                '  return (\n    <PageContainer>\n      <Title>Validator Details</Title>\n\n      <div className="mt-6">\n        <ValidatorsInfo validator={validator} />',
+                '  if (!validator) {\n    return (\n      <PageContainer>\n        <Title>Validator Details</Title>\n        <div className="py-8 text-center text-muted-foreground">Validator not found.</div>\n      </PageContainer>\n    );\n  }\n\n  return (\n    <PageContainer>\n      <Title>Validator Details</Title>\n\n      <div className="mt-6">\n        <ValidatorsInfo validator={validator} />'
+              )
+            if new_content != content:
+              with open(validators_path, 'w') as f:
+                f.write(new_content)
+              print(f'PATCHED (validators): {validators_path}')
+
+          print('Patch complete.')
+          PYEOF
           echo "Remaining files in $APP:"
           find "$APP" -type f | sort
 
