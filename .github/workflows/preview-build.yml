@@ -43,9 +43,12 @@ jobs:
         run: |
           CONFIG=repo/apps/stats-web/next.config.js
           sed -i 's/output: "standalone"/output: process.env.NEXT_STATIC_EXPORT === "1" ? "export" : "standalone"/' "$CONFIG"
-          # Route handlers (route.ts/js) can't be statically exported — remove all of them.
-          find repo/apps/stats-web/src/app -name "route.ts" -delete
-          find repo/apps/stats-web/src/app -name "route.js" -delete
+          # Remove all Next.js dynamic route files — route handlers, manifest, sitemap,
+          # robots, OG images, icons — none of these can be statically exported.
+          APP=repo/apps/stats-web/src/app
+          for name in route manifest sitemap robots opengraph-image twitter-image icon apple-icon; do
+            find "$APP" \( -name "${name}.ts" -o -name "${name}.tsx" -o -name "${name}.js" -o -name "${name}.jsx" \) -delete
+          done
 
       - name: Build stats-web (static export)
         run: cd repo && NEXT_STATIC_EXPORT=1 npm run build --workspace=apps/stats-web
