@@ -64,9 +64,16 @@ jobs:
       - name: Build stats-web (static export)
         run: cd repo && NEXT_STATIC_EXPORT=1 npm run build --workspace=apps/stats-web
         env:
-          # Suppress Sentry plugin — no auth token available in preview builds
           SENTRY_AUTH_TOKEN: ""
           CI: "true"
+          NEXT_PUBLIC_NODE_ENV: production
+          NEXT_PUBLIC_API_BASE_URL: https://console-api.akash.network
+          NEXT_PUBLIC_BASE_API_MAINNET_URL: https://console-api.akash.network
+          NEXT_PUBLIC_BASE_API_TESTNET_URL: https://console-api-testnet.akash.network
+          NEXT_PUBLIC_BASE_API_SANDBOX_URL: https://console-api-sandbox.akash.network
+          BASE_API_MAINNET_URL: https://console-api.akash.network
+          BASE_API_TESTNET_URL: https://console-api-testnet.akash.network
+          BASE_API_SANDBOX_URL: https://console-api-sandbox.akash.network
 
       - name: Upload preview artifact
         uses: actions/upload-artifact@v4
